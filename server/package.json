@@ -11,13 +11,16 @@
   "description": "",
   "dependencies": {
     "@sendgrid/mail": "^8.1.4",
+    "@thirdweb-dev/sdk": "^4.0.99",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.1",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "thirdweb": "^5.93.14"
   }
 }
