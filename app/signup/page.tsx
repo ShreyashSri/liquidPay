@@ -1,16 +1,31 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Eye, EyeOff, CheckCircle2, User, Mail, Lock, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  User,
+  Mail,
+  Lock,
+  AlertCircle,
+} from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -18,51 +33,52 @@ export default function SignupPage() {
     email: "",
     password: "",
     confirmPassword: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const router = useRouter()
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Passwords do not match");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsLoading(false)
-      router.push("/onboarding")
-    }, 1500)
-  }
+      setIsLoading(false);
+      router.push("/onboarding");
+    }, 1500);
+  };
 
   const handleSocialSignup = (provider: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsLoading(false)
-      router.push("/onboarding")
-    }, 1500)
-  }
+      setIsLoading(false);
+      router.push("/onboarding");
+    }, 1500);
+  };
 
   // Password strength indicators
-  const hasMinLength = formData.password.length >= 8
-  const hasUpperCase = /[A-Z]/.test(formData.password)
-  const hasNumber = /[0-9]/.test(formData.password)
-  const passwordsMatch = formData.password === formData.confirmPassword && formData.password !== ""
+  const hasMinLength = formData.password.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(formData.password);
+  const hasNumber = /[0-9]/.test(formData.password);
+  const passwordsMatch =
+    formData.password === formData.confirmPassword && formData.password !== "";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black py-20 relative overflow-hidden">
@@ -100,14 +116,19 @@ export default function SignupPage() {
                 </svg>
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-white">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">
+              Create an account
+            </CardTitle>
             <CardDescription className="text-gray-400">
-              Enter your information to get started with FinSavvy AI
+              Enter your information to get started with Liquidpay
             </CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert variant="destructive" className="mb-4 bg-red-900/30 border-red-800 text-red-300">
+              <Alert
+                variant="destructive"
+                className="mb-4 bg-red-900/30 border-red-800 text-red-300"
+              >
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -182,20 +203,45 @@ export default function SignupPage() {
 
                 <div className="space-y-1 mt-2">
                   <div className="flex items-center space-x-2">
-                    <CheckCircle2 size={16} className={hasMinLength ? "text-green-500" : "text-gray-500"} />
-                    <span className={`text-xs ${hasMinLength ? "text-green-500" : "text-gray-500"}`}>
+                    <CheckCircle2
+                      size={16}
+                      className={
+                        hasMinLength ? "text-green-500" : "text-gray-500"
+                      }
+                    />
+                    <span
+                      className={`text-xs ${
+                        hasMinLength ? "text-green-500" : "text-gray-500"
+                      }`}
+                    >
                       At least 8 characters
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle2 size={16} className={hasUpperCase ? "text-green-500" : "text-gray-500"} />
-                    <span className={`text-xs ${hasUpperCase ? "text-green-500" : "text-gray-500"}`}>
+                    <CheckCircle2
+                      size={16}
+                      className={
+                        hasUpperCase ? "text-green-500" : "text-gray-500"
+                      }
+                    />
+                    <span
+                      className={`text-xs ${
+                        hasUpperCase ? "text-green-500" : "text-gray-500"
+                      }`}
+                    >
                       At least one uppercase letter
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle2 size={16} className={hasNumber ? "text-green-500" : "text-gray-500"} />
-                    <span className={`text-xs ${hasNumber ? "text-green-500" : "text-gray-500"}`}>
+                    <CheckCircle2
+                      size={16}
+                      className={hasNumber ? "text-green-500" : "text-gray-500"}
+                    />
+                    <span
+                      className={`text-xs ${
+                        hasNumber ? "text-green-500" : "text-gray-500"
+                      }`}
+                    >
                       At least one number
                     </span>
                   </div>
@@ -221,7 +267,9 @@ export default function SignupPage() {
                   />
                 </div>
                 {formData.confirmPassword && !passwordsMatch && (
-                  <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    Passwords do not match
+                  </p>
                 )}
               </div>
               <Button
@@ -264,7 +312,9 @@ export default function SignupPage() {
                 <div className="w-full border-t border-gray-700"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-gray-900 px-2 text-gray-400">Or continue with</span>
+                <span className="bg-gray-900 px-2 text-gray-400">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -301,7 +351,11 @@ export default function SignupPage() {
                 onClick={() => handleSocialSignup("facebook")}
                 disabled={isLoading}
               >
-                <svg className="mr-2 h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="mr-2 h-4 w-4 text-blue-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path d="M9.19795 21.5H13.198V13.4901H16.8021L17.198 9.50977H13.198V7.5C13.198 6.94772 13.6457 6.5 14.198 6.5H17.198V2.5H14.198C11.4365 2.5 9.19795 4.73858 9.19795 7.5V9.50977H7.19795L6.80206 13.4901H9.19795V21.5Z"></path>
                 </svg>
                 Facebook
@@ -311,7 +365,10 @@ export default function SignupPage() {
           <CardFooter className="flex justify-center border-t border-gray-800 pt-6">
             <p className="text-gray-400 text-sm">
               Already have an account?{" "}
-              <Link href="/login" className="text-yellow-500 hover:text-yellow-400 font-medium transition-colors">
+              <Link
+                href="/login"
+                className="text-yellow-500 hover:text-yellow-400 font-medium transition-colors"
+              >
                 Sign in
               </Link>
             </p>
@@ -319,6 +376,5 @@ export default function SignupPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

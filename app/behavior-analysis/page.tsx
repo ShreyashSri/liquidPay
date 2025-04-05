@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { BarChart, PieChart, ChartContainer } from "@/components/ui/chart"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { BarChart, PieChart, ChartContainer } from "@/components/ui/chart";
 import {
   TrendingUp,
   TrendingDown,
@@ -22,7 +28,7 @@ import {
   DollarSign,
   AlertCircle,
   Brain,
-} from "lucide-react"
+} from "lucide-react";
 
 // Mock data for spending patterns
 const weekdaySpending = [
@@ -33,21 +39,21 @@ const weekdaySpending = [
   { day: "Friday", amount: 780 },
   { day: "Saturday", amount: 950 },
   { day: "Sunday", amount: 620 },
-]
+];
 
 const timeOfDaySpending = [
   { time: "Morning (6AM-12PM)", amount: 1200 },
   { time: "Afternoon (12PM-5PM)", amount: 1800 },
   { time: "Evening (5PM-9PM)", amount: 2500 },
   { time: "Night (9PM-6AM)", amount: 1500 },
-]
+];
 
 const locationSpending = [
   { location: "Online", amount: 3500 },
   { location: "Physical Stores", amount: 2800 },
   { location: "Restaurants", amount: 1800 },
   { location: "Entertainment Venues", amount: 900 },
-]
+];
 
 // Mock data for behavior insights
 const behaviors = {
@@ -66,7 +72,8 @@ const behaviors = {
     {
       id: 2,
       title: "Daily Coffee Runs",
-      description: "You spend on coffee shops 18 times per month, averaging ₹250 per visit.",
+      description:
+        "You spend on coffee shops 18 times per month, averaging ₹250 per visit.",
       impact: "medium",
       savings: "₹2,500/month",
       icon: <Coffee className="h-5 w-5 text-yellow-500" />,
@@ -77,7 +84,8 @@ const behaviors = {
     {
       id: 3,
       title: "Food Delivery",
-      description: "You order food delivery 3-4 times per week, often during work hours.",
+      description:
+        "You order food delivery 3-4 times per week, often during work hours.",
       impact: "medium",
       savings: "₹4,000/month",
       icon: <Utensils className="h-5 w-5 text-yellow-500" />,
@@ -88,7 +96,8 @@ const behaviors = {
     {
       id: 4,
       title: "Subscription Overload",
-      description: "You have 8 active subscriptions, but regularly use only 4 of them.",
+      description:
+        "You have 8 active subscriptions, but regularly use only 4 of them.",
       impact: "medium",
       savings: "₹1,800/month",
       icon: <CreditCard className="h-5 w-5 text-yellow-500" />,
@@ -101,7 +110,8 @@ const behaviors = {
     {
       id: 1,
       title: "Consistent Savings",
-      description: "You've maintained a regular savings deposit for 3 consecutive months.",
+      description:
+        "You've maintained a regular savings deposit for 3 consecutive months.",
       impact: "high",
       trend: "up",
       icon: <TrendingUp className="h-5 w-5 text-green-500" />,
@@ -112,7 +122,8 @@ const behaviors = {
     {
       id: 2,
       title: "Reduced Entertainment",
-      description: "Your entertainment spending has decreased by 15% in the last month.",
+      description:
+        "Your entertainment spending has decreased by 15% in the last month.",
       impact: "medium",
       trend: "up",
       icon: <Film className="h-5 w-5 text-green-500" />,
@@ -123,7 +134,8 @@ const behaviors = {
     {
       id: 3,
       title: "Bill Payment Timing",
-      description: "You've paid all bills on time for the past 6 months, avoiding late fees.",
+      description:
+        "You've paid all bills on time for the past 6 months, avoiding late fees.",
       impact: "medium",
       trend: "up",
       icon: <CreditCard className="h-5 w-5 text-green-500" />,
@@ -132,14 +144,15 @@ const behaviors = {
         "Your perfect record of on-time bill payments has saved you approximately ₹3,600 in potential late fees over the past 6 months. This habit also positively impacts your credit score, which has improved by 25 points during this period.",
     },
   ],
-}
+};
 
 // Mock recommendations
 const recommendations = [
   {
     id: 1,
     title: 'Set a "Cooling Off" Period',
-    description: "For online purchases over ₹2,000, wait 24 hours before completing the transaction.",
+    description:
+      "For online purchases over ₹2,000, wait 24 hours before completing the transaction.",
     impact: "high",
     savings: "₹2,800/month",
     category: "Shopping",
@@ -148,7 +161,8 @@ const recommendations = [
   {
     id: 2,
     title: "Coffee Budget",
-    description: "Set a weekly coffee shop budget of ₹1,000 and track it with our app.",
+    description:
+      "Set a weekly coffee shop budget of ₹1,000 and track it with our app.",
     impact: "medium",
     savings: "₹1,500/month",
     category: "Food & Drink",
@@ -157,7 +171,8 @@ const recommendations = [
   {
     id: 3,
     title: "Meal Prep Sundays",
-    description: "Prepare lunches for the work week to reduce food delivery orders.",
+    description:
+      "Prepare lunches for the work week to reduce food delivery orders.",
     impact: "high",
     savings: "₹3,500/month",
     category: "Food & Drink",
@@ -172,45 +187,66 @@ const recommendations = [
     category: "Entertainment",
     icon: <CreditCard className="h-5 w-5 text-yellow-500" />,
   },
-]
+];
 
 export default function BehaviorAnalysisPage() {
-  const [activeTab, setActiveTab] = useState("patterns")
-  const [selectedBehavior, setSelectedBehavior] = useState(null)
+  const [activeTab, setActiveTab] = useState("patterns");
+  const [selectedBehavior, setSelectedBehavior] = useState(null);
 
   return (
     <div className="min-h-screen bg-black pt-24 pb-16">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Behavior Analysis</h1>
-            <p className="text-gray-400">AI-powered insights into your financial habits and patterns</p>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Behavior Analysis
+            </h1>
+            <p className="text-gray-400">
+              AI-powered insights into your financial habits and patterns
+            </p>
           </div>
           <Button className="mt-4 md:mt-0 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black">
             <Brain className="h-4 w-4 mr-2" /> Get Custom Analysis
           </Button>
         </div>
 
-        <Tabs defaultValue="patterns" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs
+          defaultValue="patterns"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
           <div className="flex justify-center mb-8">
             <TabsList className="bg-gray-800 p-1">
               <TabsTrigger
                 value="patterns"
-                className={`${activeTab === "patterns" ? "bg-gray-700 text-white" : "text-gray-400"} px-6 py-2`}
+                className={`${
+                  activeTab === "patterns"
+                    ? "bg-gray-700 text-white"
+                    : "text-gray-400"
+                } px-6 py-2`}
               >
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Spending Patterns
               </TabsTrigger>
               <TabsTrigger
                 value="behaviors"
-                className={`${activeTab === "behaviors" ? "bg-gray-700 text-white" : "text-gray-400"} px-6 py-2`}
+                className={`${
+                  activeTab === "behaviors"
+                    ? "bg-gray-700 text-white"
+                    : "text-gray-400"
+                } px-6 py-2`}
               >
                 <Brain className="h-4 w-4 mr-2" />
                 Behavior Insights
               </TabsTrigger>
               <TabsTrigger
                 value="recommendations"
-                className={`${activeTab === "recommendations" ? "bg-gray-700 text-white" : "text-gray-400"} px-6 py-2`}
+                className={`${
+                  activeTab === "recommendations"
+                    ? "bg-gray-700 text-white"
+                    : "text-gray-400"
+                } px-6 py-2`}
               >
                 <Lightbulb className="h-4 w-4 mr-2" />
                 Recommendations
@@ -224,7 +260,9 @@ export default function BehaviorAnalysisPage() {
                 <CardHeader>
                   <div className="flex items-center">
                     <Calendar className="h-5 w-5 text-yellow-500 mr-2" />
-                    <CardTitle className="text-white">Spending by Day of Week</CardTitle>
+                    <CardTitle className="text-white">
+                      Spending by Day of Week
+                    </CardTitle>
                   </div>
                   <CardDescription className="text-gray-400">
                     When you tend to spend the most during the week
@@ -250,9 +288,13 @@ export default function BehaviorAnalysisPage() {
                 <CardHeader>
                   <div className="flex items-center">
                     <Clock className="h-5 w-5 text-yellow-500 mr-2" />
-                    <CardTitle className="text-white">Spending by Time of Day</CardTitle>
+                    <CardTitle className="text-white">
+                      Spending by Time of Day
+                    </CardTitle>
                   </div>
-                  <CardDescription className="text-gray-400">When you spend the most during the day</CardDescription>
+                  <CardDescription className="text-gray-400">
+                    When you spend the most during the day
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
@@ -275,9 +317,13 @@ export default function BehaviorAnalysisPage() {
               <CardHeader>
                 <div className="flex items-center">
                   <MapPin className="h-5 w-5 text-yellow-500 mr-2" />
-                  <CardTitle className="text-white">Spending by Location Type</CardTitle>
+                  <CardTitle className="text-white">
+                    Spending by Location Type
+                  </CardTitle>
                 </div>
-                <CardDescription className="text-gray-400">Where you tend to spend your money</CardDescription>
+                <CardDescription className="text-gray-400">
+                  Where you tend to spend your money
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-80">
@@ -299,31 +345,37 @@ export default function BehaviorAnalysisPage() {
               <div className="flex items-start">
                 <AlertCircle className="h-6 w-6 text-yellow-500 mr-4 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Key Insights</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    Key Insights
+                  </h3>
                   <ul className="space-y-2 text-gray-300">
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
                       <span>
-                        You spend <strong>45% more on weekends</strong> compared to weekdays.
+                        You spend <strong>45% more on weekends</strong> compared
+                        to weekdays.
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
                       <span>
-                        Evening hours (5PM-9PM) account for <strong>35% of your total spending</strong>.
+                        Evening hours (5PM-9PM) account for{" "}
+                        <strong>35% of your total spending</strong>.
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
                       <span>
-                        Online shopping represents <strong>39% of your monthly expenses</strong>, higher than the
-                        average of 25%.
+                        Online shopping represents{" "}
+                        <strong>39% of your monthly expenses</strong>, higher
+                        than the average of 25%.
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
                       <span>
-                        Your spending peaks on <strong>Friday evenings</strong>, often on dining and entertainment.
+                        Your spending peaks on <strong>Friday evenings</strong>,
+                        often on dining and entertainment.
                       </span>
                     </li>
                   </ul>
@@ -346,13 +398,14 @@ export default function BehaviorAnalysisPage() {
                 <Card className="bg-gray-800 border-gray-700 shadow-lg overflow-hidden">
                   <div
                     className={`h-1.5 w-full ${
-                      selectedBehavior.impact === "high" && "trend" in selectedBehavior
+                      selectedBehavior.impact === "high" &&
+                      "trend" in selectedBehavior
                         ? "bg-gradient-to-r from-green-600 to-green-400"
                         : selectedBehavior.impact === "high"
-                          ? "bg-gradient-to-r from-red-600 to-red-400"
-                          : "trend" in selectedBehavior
-                            ? "bg-gradient-to-r from-green-600 to-green-400"
-                            : "bg-gradient-to-r from-yellow-600 to-yellow-400"
+                        ? "bg-gradient-to-r from-red-600 to-red-400"
+                        : "trend" in selectedBehavior
+                        ? "bg-gradient-to-r from-green-600 to-green-400"
+                        : "bg-gradient-to-r from-yellow-600 to-yellow-400"
                     }`}
                   ></div>
                   <CardHeader>
@@ -362,15 +415,19 @@ export default function BehaviorAnalysisPage() {
                           "trend" in selectedBehavior
                             ? "bg-green-500/10"
                             : selectedBehavior.impact === "high"
-                              ? "bg-red-500/10"
-                              : "bg-yellow-500/10"
+                            ? "bg-red-500/10"
+                            : "bg-yellow-500/10"
                         } mr-3`}
                       >
                         {selectedBehavior.icon}
                       </div>
                       <div>
-                        <CardTitle className="text-white text-xl">{selectedBehavior.title}</CardTitle>
-                        <CardDescription className="text-gray-400">{selectedBehavior.description}</CardDescription>
+                        <CardTitle className="text-white text-xl">
+                          {selectedBehavior.title}
+                        </CardTitle>
+                        <CardDescription className="text-gray-400">
+                          {selectedBehavior.description}
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
@@ -378,7 +435,9 @@ export default function BehaviorAnalysisPage() {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-400">Behavior Strength</span>
-                        <span className="text-white font-medium">{selectedBehavior.progress}%</span>
+                        <span className="text-white font-medium">
+                          {selectedBehavior.progress}%
+                        </span>
                       </div>
                       <Progress
                         value={selectedBehavior.progress}
@@ -387,15 +446,19 @@ export default function BehaviorAnalysisPage() {
                           "trend" in selectedBehavior
                             ? "bg-gradient-to-r from-green-600 to-green-400"
                             : selectedBehavior.impact === "high"
-                              ? "bg-gradient-to-r from-red-600 to-red-400"
-                              : "bg-gradient-to-r from-yellow-600 to-yellow-400"
+                            ? "bg-gradient-to-r from-red-600 to-red-400"
+                            : "bg-gradient-to-r from-yellow-600 to-yellow-400"
                         }`}
                       />
                     </div>
 
                     <div className="bg-gray-700/50 rounded-lg p-4">
-                      <h4 className="text-white font-medium mb-2">Detailed Analysis</h4>
-                      <p className="text-gray-300 text-sm">{selectedBehavior.details}</p>
+                      <h4 className="text-white font-medium mb-2">
+                        Detailed Analysis
+                      </h4>
+                      <p className="text-gray-300 text-sm">
+                        {selectedBehavior.details}
+                      </p>
                     </div>
 
                     {"savings" in selectedBehavior && (
@@ -403,11 +466,17 @@ export default function BehaviorAnalysisPage() {
                         <div className="flex items-center">
                           <DollarSign className="h-5 w-5 text-yellow-500 mr-2" />
                           <div>
-                            <p className="text-gray-300 text-sm">Potential Monthly Savings</p>
-                            <p className="text-white font-semibold text-lg">{selectedBehavior.savings}</p>
+                            <p className="text-gray-300 text-sm">
+                              Potential Monthly Savings
+                            </p>
+                            <p className="text-white font-semibold text-lg">
+                              {selectedBehavior.savings}
+                            </p>
                           </div>
                         </div>
-                        <Button className="bg-yellow-600 hover:bg-yellow-500 text-white">Get Recommendations</Button>
+                        <Button className="bg-yellow-600 hover:bg-yellow-500 text-white">
+                          Get Recommendations
+                        </Button>
                       </div>
                     )}
 
@@ -416,11 +485,17 @@ export default function BehaviorAnalysisPage() {
                         <div className="flex items-center">
                           <TrendingUp className="h-5 w-5 text-green-500 mr-2" />
                           <div>
-                            <p className="text-gray-300 text-sm">Positive Trend</p>
-                            <p className="text-white font-semibold text-lg">Keep it up!</p>
+                            <p className="text-gray-300 text-sm">
+                              Positive Trend
+                            </p>
+                            <p className="text-white font-semibold text-lg">
+                              Keep it up!
+                            </p>
                           </div>
                         </div>
-                        <Button className="bg-green-600 hover:bg-green-500 text-white">Set New Goals</Button>
+                        <Button className="bg-green-600 hover:bg-green-500 text-white">
+                          Set New Goals
+                        </Button>
                       </div>
                     )}
                   </CardContent>
@@ -463,19 +538,27 @@ export default function BehaviorAnalysisPage() {
                                 }
                               `}
                               >
-                                {behavior.impact === "high" ? "High Impact" : "Medium Impact"}
+                                {behavior.impact === "high"
+                                  ? "High Impact"
+                                  : "Medium Impact"}
                               </Badge>
                             </div>
 
                             <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-red-400 transition-colors">
                               {behavior.title}
                             </h3>
-                            <p className="text-gray-400 mb-4 text-sm">{behavior.description}</p>
+                            <p className="text-gray-400 mb-4 text-sm">
+                              {behavior.description}
+                            </p>
 
                             <div className="space-y-3 mb-4">
                               <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-400">Behavior Strength</span>
-                                <span className="text-white font-medium">{behavior.progress}%</span>
+                                <span className="text-gray-400">
+                                  Behavior Strength
+                                </span>
+                                <span className="text-white font-medium">
+                                  {behavior.progress}%
+                                </span>
                               </div>
                               <Progress
                                 value={behavior.progress}
@@ -486,8 +569,12 @@ export default function BehaviorAnalysisPage() {
 
                             <div className="flex justify-between items-center">
                               <div>
-                                <span className="text-xs text-gray-500">Potential Savings</span>
-                                <p className="text-white font-semibold">{behavior.savings}</p>
+                                <span className="text-xs text-gray-500">
+                                  Potential Savings
+                                </span>
+                                <p className="text-white font-semibold">
+                                  {behavior.savings}
+                                </p>
                               </div>
                               <Button
                                 variant="ghost"
@@ -518,19 +605,27 @@ export default function BehaviorAnalysisPage() {
                                 {behavior.icon}
                               </div>
                               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                                {behavior.impact === "high" ? "High Impact" : "Medium Impact"}
+                                {behavior.impact === "high"
+                                  ? "High Impact"
+                                  : "Medium Impact"}
                               </Badge>
                             </div>
 
                             <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-green-400 transition-colors">
                               {behavior.title}
                             </h3>
-                            <p className="text-gray-400 mb-4 text-sm">{behavior.description}</p>
+                            <p className="text-gray-400 mb-4 text-sm">
+                              {behavior.description}
+                            </p>
 
                             <div className="space-y-3 mb-4">
                               <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-400">Habit Strength</span>
-                                <span className="text-white font-medium">{behavior.progress}%</span>
+                                <span className="text-gray-400">
+                                  Habit Strength
+                                </span>
+                                <span className="text-white font-medium">
+                                  {behavior.progress}%
+                                </span>
                               </div>
                               <Progress
                                 value={behavior.progress}
@@ -541,7 +636,9 @@ export default function BehaviorAnalysisPage() {
 
                             <div className="flex justify-between items-center">
                               <div>
-                                <span className="text-xs text-gray-500">Trend</span>
+                                <span className="text-xs text-gray-500">
+                                  Trend
+                                </span>
                                 <p className="text-green-400 font-semibold flex items-center">
                                   <TrendingUp className="h-3.5 w-3.5 mr-1" />
                                   Improving
@@ -566,15 +663,20 @@ export default function BehaviorAnalysisPage() {
                   <div className="flex items-start">
                     <Brain className="h-6 w-6 text-yellow-500 mr-4 flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="text-xl font-semibold text-white mb-2">How We Analyze Your Behavior</h3>
+                      <h3 className="text-xl font-semibold text-white mb-2">
+                        How We Analyze Your Behavior
+                      </h3>
                       <p className="text-gray-300 mb-4">
-                        Our AI analyzes thousands of data points from your transaction history to identify patterns and
-                        behaviors that impact your financial health. We look at:
+                        Our AI analyzes thousands of data points from your
+                        transaction history to identify patterns and behaviors
+                        that impact your financial health. We look at:
                       </p>
                       <ul className="space-y-2 text-gray-300">
                         <li className="flex items-start">
                           <span className="text-yellow-500 mr-2">•</span>
-                          <span>Timing patterns (day of week, time of day)</span>
+                          <span>
+                            Timing patterns (day of week, time of day)
+                          </span>
                         </li>
                         <li className="flex items-start">
                           <span className="text-yellow-500 mr-2">•</span>
@@ -586,7 +688,9 @@ export default function BehaviorAnalysisPage() {
                         </li>
                         <li className="flex items-start">
                           <span className="text-yellow-500 mr-2">•</span>
-                          <span>Emotional triggers and impulse spending indicators</span>
+                          <span>
+                            Emotional triggers and impulse spending indicators
+                          </span>
                         </li>
                       </ul>
                     </div>
@@ -619,21 +723,31 @@ export default function BehaviorAnalysisPage() {
                         }
                       `}
                       >
-                        {recommendation.impact === "high" ? "High Impact" : "Medium Impact"}
+                        {recommendation.impact === "high"
+                          ? "High Impact"
+                          : "Medium Impact"}
                       </Badge>
                     </div>
 
                     <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-yellow-400 transition-colors">
                       {recommendation.title}
                     </h3>
-                    <p className="text-gray-400 mb-4 text-sm">{recommendation.description}</p>
+                    <p className="text-gray-400 mb-4 text-sm">
+                      {recommendation.description}
+                    </p>
 
                     <div className="flex justify-between items-center">
                       <div>
-                        <span className="text-xs text-gray-500">Potential Savings</span>
-                        <p className="text-white font-semibold">{recommendation.savings}</p>
+                        <span className="text-xs text-gray-500">
+                          Potential Savings
+                        </span>
+                        <p className="text-white font-semibold">
+                          {recommendation.savings}
+                        </p>
                       </div>
-                      <Button className="bg-yellow-600 hover:bg-yellow-500 text-white text-sm">Apply This Tip</Button>
+                      <Button className="bg-yellow-600 hover:bg-yellow-500 text-white text-sm">
+                        Apply This Tip
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -642,7 +756,9 @@ export default function BehaviorAnalysisPage() {
 
             <Card className="bg-gray-800 border-gray-700 shadow-lg mb-8">
               <CardHeader>
-                <CardTitle className="text-white">Projected Savings Impact</CardTitle>
+                <CardTitle className="text-white">
+                  Projected Savings Impact
+                </CardTitle>
                 <CardDescription className="text-gray-400">
                   Potential monthly savings if you implement all recommendations
                 </CardDescription>
@@ -671,27 +787,38 @@ export default function BehaviorAnalysisPage() {
               <div className="flex items-start">
                 <Lightbulb className="h-6 w-6 text-yellow-500 mr-4 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">How Our Recommendations Work</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    How Our Recommendations Work
+                  </h3>
                   <p className="text-gray-300 mb-4">
-                    Our AI analyzes your specific spending patterns and behaviors to generate personalized
-                    recommendations that:
+                    Our AI analyzes your specific spending patterns and
+                    behaviors to generate personalized recommendations that:
                   </p>
                   <ul className="space-y-2 text-gray-300">
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
-                      <span>Are realistic and achievable based on your lifestyle</span>
+                      <span>
+                        Are realistic and achievable based on your lifestyle
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
-                      <span>Target your highest-impact spending behaviors first</span>
+                      <span>
+                        Target your highest-impact spending behaviors first
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
-                      <span>Provide specific, actionable steps rather than general advice</span>
+                      <span>
+                        Provide specific, actionable steps rather than general
+                        advice
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-yellow-500 mr-2">•</span>
-                      <span>Adapt over time as your financial habits change</span>
+                      <span>
+                        Adapt over time as your financial habits change
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -701,7 +828,7 @@ export default function BehaviorAnalysisPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
 
 const Lightbulb = ({ className }) => {
@@ -722,8 +849,8 @@ const Lightbulb = ({ className }) => {
       <path d="M9 18h6" />
       <path d="M10 22h4" />
     </svg>
-  )
-}
+  );
+};
 
 const ArrowLeft = ({ className }) => {
   return (
@@ -742,8 +869,8 @@ const ArrowLeft = ({ className }) => {
       <path d="m12 19-7-7 7-7" />
       <path d="M19 12H5" />
     </svg>
-  )
-}
+  );
+};
 
 const BarChart3 = ({ className }) => {
   return (
@@ -764,6 +891,5 @@ const BarChart3 = ({ className }) => {
       <path d="M13 17V5" />
       <path d="M8 17v-3" />
     </svg>
-  )
-}
-
+  );
+};

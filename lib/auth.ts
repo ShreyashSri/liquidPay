@@ -1,23 +1,22 @@
-import { getServerSession } from "next-auth/next"
-import { redirect } from "next/navigation"
+import { getServerSession } from "next-auth/next";
+import { redirect } from "next/navigation";
 
 export async function getSession() {
-  return await getServerSession()
+  return await getServerSession();
 }
 
 export async function getCurrentUser() {
-  const session = await getSession()
+  const session = await getSession();
 
-  return session?.user
+  return session?.user;
 }
 
 export async function requireAuth() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login")
+    redirect("/login");
   }
 
-  return user
+  return user;
 }
-

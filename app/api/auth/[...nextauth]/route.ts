@@ -1,17 +1,17 @@
-import NextAuth from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import GoogleProvider from "next-auth/providers/google"
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 // Mock user database
 const users = [
   {
     id: "1",
     name: "Demo User",
-    email: "demo@finsavvy.ai",
+    email: "demo@liquidpay.ai",
     password: "$2b$10$8OxDlUjXBBTK4QQfDkbX3OoMQOdB7J7T3D8KsGm4Y0JVc5xKVEUwW", // hashed "password123"
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=demo",
   },
-]
+];
 
 const handler = NextAuth({
   providers: [
@@ -23,20 +23,20 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          return null;
         }
 
-        const user = users.find((user) => user.email === credentials.email)
+        const user = users.find((user) => user.email === credentials.email);
         if (!user) {
-          return null
+          return null;
         }
 
         // In a real app, you would use bcrypt.compare
         // For this demo, we'll simulate a successful comparison
-        const passwordMatch = credentials.password === "password123"
+        const passwordMatch = credentials.password === "password123";
 
         if (!passwordMatch) {
-          return null
+          return null;
         }
 
         return {
@@ -44,7 +44,7 @@ const handler = NextAuth({
           name: user.name,
           email: user.email,
           image: user.image,
-        }
+        };
       },
     }),
     GoogleProvider({
@@ -62,12 +62,11 @@ const handler = NextAuth({
   callbacks: {
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.sub
+        session.user.id = token.sub;
       }
-      return session
+      return session;
     },
   },
-})
+});
 
-export { handler as GET, handler as POST }
-
+export { handler as GET, handler as POST };

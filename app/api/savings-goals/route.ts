@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 // Mock savings goals data
 const savingsGoals = [
@@ -29,22 +29,25 @@ const savingsGoals = [
     deadline: "2024-06-30",
     createdAt: "2023-08-22",
   },
-]
+];
 
 export async function GET(request: Request) {
   // In a real app, you would authenticate the user and filter by userId
   // For this demo, we'll return all savings goals
 
-  return NextResponse.json(savingsGoals)
+  return NextResponse.json(savingsGoals);
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate required fields
     if (!body.name || !body.target || !body.deadline) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     // In a real app, you would save to a database
@@ -57,11 +60,13 @@ export async function POST(request: Request) {
       current: body.current || 0,
       deadline: body.deadline,
       createdAt: new Date().toISOString().split("T")[0],
-    }
+    };
 
-    return NextResponse.json(newSavingsGoal, { status: 201 })
+    return NextResponse.json(newSavingsGoal, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create savings goal" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to create savings goal" },
+      { status: 500 }
+    );
   }
 }
-

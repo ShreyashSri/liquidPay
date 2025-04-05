@@ -1,12 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, Coffee, ShoppingBag, Utensils, Film, CreditCard, ArrowRight } from "lucide-react"
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import {
+  TrendingUp,
+  TrendingDown,
+  Coffee,
+  ShoppingBag,
+  Utensils,
+  Film,
+  CreditCard,
+  ArrowRight,
+} from "lucide-react";
 
 const behaviors = {
   impulse: [
@@ -22,7 +31,8 @@ const behaviors = {
     {
       id: 2,
       title: "Daily Coffee Runs",
-      description: "You spend on coffee shops 18 times per month, averaging ₹250 per visit.",
+      description:
+        "You spend on coffee shops 18 times per month, averaging ₹250 per visit.",
       impact: "medium",
       savings: "₹2,500/month",
       icon: <Coffee className="h-5 w-5 text-yellow-500" />,
@@ -31,7 +41,8 @@ const behaviors = {
     {
       id: 3,
       title: "Food Delivery",
-      description: "You order food delivery 3-4 times per week, often during work hours.",
+      description:
+        "You order food delivery 3-4 times per week, often during work hours.",
       impact: "medium",
       savings: "₹4,000/month",
       icon: <Utensils className="h-5 w-5 text-yellow-500" />,
@@ -42,7 +53,8 @@ const behaviors = {
     {
       id: 1,
       title: "Consistent Savings",
-      description: "You've maintained a regular savings deposit for 3 consecutive months.",
+      description:
+        "You've maintained a regular savings deposit for 3 consecutive months.",
       impact: "high",
       trend: "up",
       icon: <TrendingUp className="h-5 w-5 text-green-500" />,
@@ -51,7 +63,8 @@ const behaviors = {
     {
       id: 2,
       title: "Reduced Entertainment",
-      description: "Your entertainment spending has decreased by 15% in the last month.",
+      description:
+        "Your entertainment spending has decreased by 15% in the last month.",
       impact: "medium",
       trend: "up",
       icon: <Film className="h-5 w-5 text-green-500" />,
@@ -60,17 +73,18 @@ const behaviors = {
     {
       id: 3,
       title: "Bill Payment Timing",
-      description: "You've paid all bills on time for the past 6 months, avoiding late fees.",
+      description:
+        "You've paid all bills on time for the past 6 months, avoiding late fees.",
       impact: "medium",
       trend: "up",
       icon: <CreditCard className="h-5 w-5 text-green-500" />,
       progress: 90,
     },
   ],
-}
+};
 
 export default function BehaviorInsights() {
-  const [activeTab, setActiveTab] = useState("impulse")
+  const [activeTab, setActiveTab] = useState("impulse");
 
   return (
     <section className="w-full py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
@@ -80,7 +94,9 @@ export default function BehaviorInsights() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gray-800 text-gray-300 border-gray-700">AI Analysis</Badge>
+          <Badge className="mb-4 bg-gray-800 text-gray-300 border-gray-700">
+            AI Analysis
+          </Badge>
           <h2 className="text-4xl font-bold mb-4 text-white">
             Behavioral{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
@@ -88,7 +104,8 @@ export default function BehaviorInsights() {
             </span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Our AI identifies your spending patterns and behaviors to help you make better financial decisions
+            Our AI identifies your spending patterns and behaviors to help you
+            make better financial decisions
           </p>
         </div>
 
@@ -102,14 +119,22 @@ export default function BehaviorInsights() {
             <TabsList className="bg-gray-800 p-1">
               <TabsTrigger
                 value="impulse"
-                className={`${activeTab === "impulse" ? "bg-gray-700 text-white" : "text-gray-400"} px-6 py-2`}
+                className={`${
+                  activeTab === "impulse"
+                    ? "bg-gray-700 text-white"
+                    : "text-gray-400"
+                } px-6 py-2`}
               >
                 <TrendingDown className="h-4 w-4 mr-2 text-red-500" />
                 Impulse Behaviors
               </TabsTrigger>
               <TabsTrigger
                 value="positive"
-                className={`${activeTab === "positive" ? "bg-gray-700 text-white" : "text-gray-400"} px-6 py-2`}
+                className={`${
+                  activeTab === "positive"
+                    ? "bg-gray-700 text-white"
+                    : "text-gray-400"
+                } px-6 py-2`}
               >
                 <TrendingUp className="h-4 w-4 mr-2 text-green-500" />
                 Positive Habits
@@ -139,19 +164,25 @@ export default function BehaviorInsights() {
                         }
                       `}
                       >
-                        {behavior.impact === "high" ? "High Impact" : "Medium Impact"}
+                        {behavior.impact === "high"
+                          ? "High Impact"
+                          : "Medium Impact"}
                       </Badge>
                     </div>
 
                     <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-red-400 transition-colors">
                       {behavior.title}
                     </h3>
-                    <p className="text-gray-400 mb-4 text-sm">{behavior.description}</p>
+                    <p className="text-gray-400 mb-4 text-sm">
+                      {behavior.description}
+                    </p>
 
                     <div className="space-y-3 mb-4">
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-400">Behavior Strength</span>
-                        <span className="text-white font-medium">{behavior.progress}%</span>
+                        <span className="text-white font-medium">
+                          {behavior.progress}%
+                        </span>
                       </div>
                       <Progress
                         value={behavior.progress}
@@ -162,8 +193,12 @@ export default function BehaviorInsights() {
 
                     <div className="flex justify-between items-center">
                       <div>
-                        <span className="text-xs text-gray-500">Potential Savings</span>
-                        <p className="text-white font-semibold">{behavior.savings}</p>
+                        <span className="text-xs text-gray-500">
+                          Potential Savings
+                        </span>
+                        <p className="text-white font-semibold">
+                          {behavior.savings}
+                        </p>
                       </div>
                       <Button
                         variant="ghost"
@@ -193,19 +228,25 @@ export default function BehaviorInsights() {
                         {behavior.icon}
                       </div>
                       <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                        {behavior.impact === "high" ? "High Impact" : "Medium Impact"}
+                        {behavior.impact === "high"
+                          ? "High Impact"
+                          : "Medium Impact"}
                       </Badge>
                     </div>
 
                     <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-green-400 transition-colors">
                       {behavior.title}
                     </h3>
-                    <p className="text-gray-400 mb-4 text-sm">{behavior.description}</p>
+                    <p className="text-gray-400 mb-4 text-sm">
+                      {behavior.description}
+                    </p>
 
                     <div className="space-y-3 mb-4">
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-400">Habit Strength</span>
-                        <span className="text-white font-medium">{behavior.progress}%</span>
+                        <span className="text-white font-medium">
+                          {behavior.progress}%
+                        </span>
                       </div>
                       <Progress
                         value={behavior.progress}
@@ -244,6 +285,5 @@ export default function BehaviorInsights() {
         </div>
       </div>
     </section>
-  )
+  );
 }
-

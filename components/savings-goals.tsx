@@ -1,10 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
-import { PlusCircle } from "lucide-react"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 
 const initialGoals = [
   {
@@ -31,14 +38,14 @@ const initialGoals = [
     deadline: "Jun 2024",
     color: "from-yellow-600 to-yellow-400",
   },
-]
+];
 
 export default function SavingsGoals() {
-  const [goals, setGoals] = useState(initialGoals)
+  const [goals, setGoals] = useState(initialGoals);
 
   const calculatePercentage = (current, target) => {
-    return Math.round((current / target) * 100)
-  }
+    return Math.round((current / target) * 100);
+  };
 
   return (
     <section className="w-full py-20 bg-black">
@@ -52,8 +59,13 @@ export default function SavingsGoals() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {goals.map((goal) => (
-            <Card key={goal.id} className="bg-gray-800 border-gray-700 shadow-lg overflow-hidden">
-              <div className={`h-2 w-full bg-gradient-to-r ${goal.color}`}></div>
+            <Card
+              key={goal.id}
+              className="bg-gray-800 border-gray-700 shadow-lg overflow-hidden"
+            >
+              <div
+                className={`h-2 w-full bg-gradient-to-r ${goal.color}`}
+              ></div>
               <CardHeader>
                 <CardTitle className="text-white">{goal.title}</CardTitle>
                 <CardDescription className="text-gray-400">
@@ -64,16 +76,25 @@ export default function SavingsGoals() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Progress</span>
-                    <span className="text-white font-medium">{calculatePercentage(goal.current, goal.target)}%</span>
+                    <span className="text-white font-medium">
+                      {calculatePercentage(goal.current, goal.target)}%
+                    </span>
                   </div>
-                  <Progress value={calculatePercentage(goal.current, goal.target)} className="h-2 bg-gray-700" />
+                  <Progress
+                    value={calculatePercentage(goal.current, goal.target)}
+                    className="h-2 bg-gray-700"
+                  />
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Current</span>
-                    <span className="text-white font-medium">₹{goal.current.toLocaleString()}</span>
+                    <span className="text-white font-medium">
+                      ₹{goal.current.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Remaining</span>
-                    <span className="text-white font-medium">₹{(goal.target - goal.current).toLocaleString()}</span>
+                    <span className="text-white font-medium">
+                      ₹{(goal.target - goal.current).toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -87,8 +108,12 @@ export default function SavingsGoals() {
 
           <Card className="bg-gray-800 border-gray-700 shadow-lg flex flex-col items-center justify-center p-8 border-dashed">
             <PlusCircle className="h-12 w-12 text-gray-600 mb-4" />
-            <h3 className="text-xl font-medium text-gray-400 mb-2">Create New Goal</h3>
-            <p className="text-gray-500 text-center mb-4">Set up a new savings target to track your progress</p>
+            <h3 className="text-xl font-medium text-gray-400 mb-2">
+              Create New Goal
+            </h3>
+            <p className="text-gray-500 text-center mb-4">
+              Set up a new savings target to track your progress
+            </p>
             <Button className="bg-gradient-to-r from-yellow-700 to-yellow-600 hover:from-yellow-600 hover:to-yellow-500 border-none">
               Add Goal
             </Button>
@@ -96,6 +121,5 @@ export default function SavingsGoals() {
         </div>
       </div>
     </section>
-  )
+  );
 }
-

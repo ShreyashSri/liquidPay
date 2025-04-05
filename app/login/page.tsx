@@ -1,53 +1,60 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsLoading(false)
+      setIsLoading(false);
 
       // Simple validation for demo purposes
-      if (email === "demo@finsavvy.ai" && password === "password") {
-        router.push("/dashboard")
+      if (email === "demo@liquidpay" && password === "password") {
+        router.push("/dashboard");
       } else {
-        setError("Invalid email or password. Try demo@finsavvy.ai / password")
+        setError("Invalid email or password. Try demo@liquidpay / password");
       }
-    }, 1500)
-  }
+    }, 1500);
+  };
 
   const handleSocialLogin = (provider: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsLoading(false)
-      router.push("/dashboard")
-    }, 1500)
-  }
+      setIsLoading(false);
+      router.push("/dashboard");
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black py-20 relative overflow-hidden">
@@ -85,12 +92,19 @@ export default function LoginPage() {
                 </svg>
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-white">Welcome back</CardTitle>
-            <CardDescription className="text-gray-400">Enter your credentials to access your account</CardDescription>
+            <CardTitle className="text-2xl font-bold text-white">
+              Welcome back
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Enter your credentials to access your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert variant="destructive" className="mb-4 bg-red-900/30 border-red-800 text-red-300">
+              <Alert
+                variant="destructive"
+                className="mb-4 bg-red-900/30 border-red-800 text-red-300"
+              >
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -199,7 +213,9 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-700"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-gray-900 px-2 text-gray-400">Or continue with</span>
+                <span className="bg-gray-900 px-2 text-gray-400">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -236,7 +252,11 @@ export default function LoginPage() {
                 onClick={() => handleSocialLogin("facebook")}
                 disabled={isLoading}
               >
-                <svg className="mr-2 h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="mr-2 h-4 w-4 text-blue-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path d="M9.19795 21.5H13.198V13.4901H16.8021L17.198 9.50977H13.198V7.5C13.198 6.94772 13.6457 6.5 14.198 6.5H17.198V2.5H14.198C11.4365 2.5 9.19795 4.73858 9.19795 7.5V9.50977H7.19795L6.80206 13.4901H9.19795V21.5Z"></path>
                 </svg>
                 Facebook
@@ -246,7 +266,10 @@ export default function LoginPage() {
           <CardFooter className="flex justify-center border-t border-gray-800 pt-6">
             <p className="text-gray-400 text-sm">
               Don't have an account?{" "}
-              <Link href="/signup" className="text-yellow-500 hover:text-yellow-400 font-medium transition-colors">
+              <Link
+                href="/signup"
+                className="text-yellow-500 hover:text-yellow-400 font-medium transition-colors"
+              >
                 Sign up
               </Link>
             </p>
@@ -254,6 +277,5 @@ export default function LoginPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

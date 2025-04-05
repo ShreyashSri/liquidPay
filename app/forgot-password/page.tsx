@@ -1,30 +1,37 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsLoading(false)
-      setIsSubmitted(true)
-    }, 1500)
-  }
+      setIsLoading(false);
+      setIsSubmitted(true);
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black py-20 relative overflow-hidden">
@@ -40,16 +47,22 @@ export default function ForgotPasswordPage() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-600 to-yellow-400"></div>
 
           <CardHeader className="space-y-1">
-            <Link href="/login" className="flex items-center text-gray-400 hover:text-white transition-colors mb-4">
+            <Link
+              href="/login"
+              className="flex items-center text-gray-400 hover:text-white transition-colors mb-4"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to login
             </Link>
 
             {!isSubmitted ? (
               <>
-                <CardTitle className="text-2xl font-bold text-white">Forgot password</CardTitle>
+                <CardTitle className="text-2xl font-bold text-white">
+                  Forgot password
+                </CardTitle>
                 <CardDescription className="text-gray-400">
-                  Enter your email address and we'll send you a link to reset your password
+                  Enter your email address and we'll send you a link to reset
+                  your password
                 </CardDescription>
               </>
             ) : (
@@ -59,9 +72,12 @@ export default function ForgotPasswordPage() {
                     <CheckCircle className="h-6 w-6 text-green-500" />
                   </div>
                 </div>
-                <CardTitle className="text-2xl font-bold text-white text-center">Check your email</CardTitle>
+                <CardTitle className="text-2xl font-bold text-white text-center">
+                  Check your email
+                </CardTitle>
                 <CardDescription className="text-gray-400 text-center">
-                  We've sent a password reset link to <span className="text-white font-medium">{email}</span>
+                  We've sent a password reset link to{" "}
+                  <span className="text-white font-medium">{email}</span>
                 </CardDescription>
               </>
             )}
@@ -127,7 +143,8 @@ export default function ForgotPasswordPage() {
             ) : (
               <div className="space-y-4">
                 <p className="text-gray-400 text-sm text-center">
-                  Didn't receive the email? Check your spam folder or try again with a different email address.
+                  Didn't receive the email? Check your spam folder or try again
+                  with a different email address.
                 </p>
 
                 <Button
@@ -144,7 +161,10 @@ export default function ForgotPasswordPage() {
           <CardFooter className="flex justify-center border-t border-gray-800 pt-6">
             <p className="text-gray-400 text-sm">
               Remember your password?{" "}
-              <Link href="/login" className="text-yellow-500 hover:text-yellow-400 font-medium transition-colors">
+              <Link
+                href="/login"
+                className="text-yellow-500 hover:text-yellow-400 font-medium transition-colors"
+              >
                 Sign in
               </Link>
             </p>
@@ -152,6 +172,5 @@ export default function ForgotPasswordPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

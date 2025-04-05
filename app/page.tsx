@@ -1,16 +1,23 @@
-import Link from "next/link"
-import { ArrowRight, Sparkles, TrendingUp, CreditCard, Brain, BarChart3 } from "lucide-react"
-import HeroScene from "@/components/hero-scene"
-import FeatureSection from "@/components/feature-section"
-import SpendingInsights from "@/components/spending-insights"
-import SavingsGoals from "@/components/savings-goals"
-import Testimonials from "@/components/testimonials"
-import ScrollDownIndicator from "@/components/scroll-down-indicator"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import BankIntegration from "@/components/bank-integration"
-import BehaviorInsights from "@/components/behavior-insights"
-import AiFeatureShowcase from "@/components/ai-feature-showcase"
+import Link from "next/link";
+import {
+  ArrowRight,
+  Sparkles,
+  TrendingUp,
+  CreditCard,
+  Brain,
+  BarChart3,
+} from "lucide-react";
+import HeroScene from "@/components/hero-scene";
+import FeatureSection from "@/components/feature-section";
+import SpendingInsights from "@/components/spending-insights";
+import SavingsGoals from "@/components/savings-goals";
+import Testimonials from "@/components/testimonials";
+import ScrollDownIndicator from "@/components/scroll-down-indicator";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import BankIntegration from "@/components/bank-integration";
+import BehaviorInsights from "@/components/behavior-insights";
+import AiFeatureShowcase from "@/components/ai-feature-showcase";
 
 export default function Home() {
   return (
@@ -26,7 +33,8 @@ export default function Home() {
         <div className="container mx-auto px-4 z-10 relative">
           <div className="max-w-3xl">
             <Badge className="mb-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30 backdrop-blur-sm py-1.5">
-              <Sparkles className="h-3.5 w-3.5 mr-1" /> AI-Powered Financial Assistant
+              <Sparkles className="h-3.5 w-3.5 mr-1" /> AI-Powered Financial
+              Assistant
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
               Reshape Your{" "}
@@ -36,8 +44,9 @@ export default function Home() {
               with AI
             </h1>
             <p className="text-xl text-gray-300 mb-8">
-              Our AI-powered assistant helps young adults curb impulse spending and build savings discipline through
-              personalized real-time nudges.
+              Our AI-powered assistant helps young adults curb impulse spending
+              and build savings discipline through personalized real-time
+              nudges.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/signup">
@@ -82,8 +91,12 @@ export default function Home() {
       <section className="w-full py-20 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-gray-800 text-gray-300 border-gray-700">Simple Process</Badge>
-            <h2 className="text-4xl font-bold mb-4 text-white">How FinSavvy AI Works</h2>
+            <Badge className="mb-4 bg-gray-800 text-gray-300 border-gray-700">
+              Simple Process
+            </Badge>
+            <h2 className="text-4xl font-bold mb-4 text-white">
+              How Liquidpay Works
+            </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
               Transform your financial habits in three simple steps
             </p>
@@ -96,12 +109,18 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <CreditCard className="h-6 w-6 text-black" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">Connect Your Accounts</h3>
+                <h3 className="text-2xl font-semibold mb-3 text-white">
+                  Connect Your Accounts
+                </h3>
                 <p className="text-gray-400">
-                  Securely link your bank accounts and credit cards to get a complete view of your finances.
+                  Securely link your bank accounts and credit cards to get a
+                  complete view of your finances.
                 </p>
                 <Link href="/connect-bank">
-                  <Button variant="link" className="p-0 h-auto mt-4 text-yellow-500 hover:text-yellow-400">
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto mt-4 text-yellow-500 hover:text-yellow-400"
+                  >
                     Connect Now <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </Link>
@@ -114,12 +133,18 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <Brain className="h-6 w-6 text-black" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">Get AI Analysis</h3>
+                <h3 className="text-2xl font-semibold mb-3 text-white">
+                  Get AI Analysis
+                </h3>
                 <p className="text-gray-400">
-                  Our AI analyzes your spending patterns and identifies opportunities to save and improve habits.
+                  Our AI analyzes your spending patterns and identifies
+                  opportunities to save and improve habits.
                 </p>
                 <Link href="/behavior-analysis">
-                  <Button variant="link" className="p-0 h-auto mt-4 text-yellow-500 hover:text-yellow-400">
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto mt-4 text-yellow-500 hover:text-yellow-400"
+                  >
                     Learn More <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </Link>
@@ -132,12 +157,18 @@ export default function Home() {
                 <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <BarChart3 className="h-6 w-6 text-black" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">Receive Smart Nudges</h3>
+                <h3 className="text-2xl font-semibold mb-3 text-white">
+                  Receive Smart Nudges
+                </h3>
                 <p className="text-gray-400">
-                  Get personalized notifications that help you make better financial decisions in real-time.
+                  Get personalized notifications that help you make better
+                  financial decisions in real-time.
                 </p>
                 <Link href="/nudges">
-                  <Button variant="link" className="p-0 h-auto mt-4 text-yellow-500 hover:text-yellow-400">
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto mt-4 text-yellow-500 hover:text-yellow-400"
+                  >
                     See Examples <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </Link>
@@ -177,12 +208,15 @@ export default function Home() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">Limited Time Offer</Badge>
+            <Badge className="mb-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+              Limited Time Offer
+            </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
               Start Your Financial Transformation Today
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of young adults who have already improved their financial habits with FinSavvy AI.
+              Join thousands of young adults who have already improved their
+              financial habits with LIQUIDPAY AI.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/signup">
@@ -203,11 +237,12 @@ export default function Home() {
                 </Button>
               </Link>
             </div>
-            <p className="text-gray-400 mt-6">No credit card required. 14-day free trial.</p>
+            <p className="text-gray-400 mt-6">
+              No credit card required. 14-day free trial.
+            </p>
           </div>
         </div>
       </section>
     </main>
-  )
+  );
 }
-

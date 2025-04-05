@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowUpRight, ArrowDownRight, Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowUpRight, ArrowDownRight, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 // Mock transaction data
 const transactions = [
@@ -56,21 +56,21 @@ const transactions = [
     category: "Bills",
     type: "expense",
   },
-]
+];
 
 export default function RecentTransactions() {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredTransactions = transactions.filter(
     (transaction) =>
       transaction.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.category.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      transaction.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
-  }
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  };
 
   return (
     <div className="space-y-4">
@@ -93,7 +93,11 @@ export default function RecentTransactions() {
             >
               <div className="flex items-center space-x-4">
                 <div
-                  className={`p-2 rounded-full ${transaction.type === "income" ? "bg-green-500/20" : "bg-red-500/20"}`}
+                  className={`p-2 rounded-full ${
+                    transaction.type === "income"
+                      ? "bg-green-500/20"
+                      : "bg-red-500/20"
+                  }`}
                 >
                   {transaction.type === "income" ? (
                     <ArrowUpRight className="h-5 w-5 text-green-500" />
@@ -103,14 +107,26 @@ export default function RecentTransactions() {
                 </div>
                 <div>
                   <p className="font-medium text-white">{transaction.name}</p>
-                  <p className="text-sm text-gray-400">{formatDate(transaction.date)}</p>
+                  <p className="text-sm text-gray-400">
+                    {formatDate(transaction.date)}
+                  </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className={`font-medium ${transaction.type === "income" ? "text-green-500" : "text-white"}`}>
-                  {transaction.type === "income" ? "+" : ""}₹{Math.abs(transaction.amount).toLocaleString()}
+                <p
+                  className={`font-medium ${
+                    transaction.type === "income"
+                      ? "text-green-500"
+                      : "text-white"
+                  }`}
+                >
+                  {transaction.type === "income" ? "+" : ""}₹
+                  {Math.abs(transaction.amount).toLocaleString()}
                 </p>
-                <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600">
+                <Badge
+                  variant="outline"
+                  className="bg-gray-800 text-gray-300 border-gray-600"
+                >
                   {transaction.category}
                 </Badge>
               </div>
@@ -124,11 +140,13 @@ export default function RecentTransactions() {
       </div>
 
       <div className="text-center">
-        <Button variant="outline" className="text-gray-300 border-gray-600 hover:bg-gray-700">
+        <Button
+          variant="outline"
+          className="text-gray-300 border-gray-600 hover:bg-gray-700"
+        >
           View All Transactions
         </Button>
       </div>
     </div>
-  )
+  );
 }
-

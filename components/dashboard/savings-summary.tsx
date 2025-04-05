@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 // Mock savings goals data
 const savingsGoals = [
@@ -26,12 +26,12 @@ const savingsGoals = [
     current: 48000,
     deadline: "Jun 2024",
   },
-]
+];
 
 export default function SavingsSummary() {
   const calculatePercentage = (current, target) => {
-    return Math.round((current / target) * 100)
-  }
+    return Math.round((current / target) * 100);
+  };
 
   return (
     <div className="space-y-6">
@@ -42,13 +42,24 @@ export default function SavingsSummary() {
             <span className="text-xs text-gray-400">Due: {goal.deadline}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-gray-400">₹{goal.current.toLocaleString()}</span>
-            <span className="text-gray-400">₹{goal.target.toLocaleString()}</span>
+            <span className="text-gray-400">
+              ₹{goal.current.toLocaleString()}
+            </span>
+            <span className="text-gray-400">
+              ₹{goal.target.toLocaleString()}
+            </span>
           </div>
-          <Progress value={calculatePercentage(goal.current, goal.target)} className="h-2 bg-gray-700" />
+          <Progress
+            value={calculatePercentage(goal.current, goal.target)}
+            className="h-2 bg-gray-700"
+          />
           <div className="flex justify-between items-center text-xs">
-            <span className="text-gray-500">{calculatePercentage(goal.current, goal.target)}% complete</span>
-            <span className="text-gray-500">₹{(goal.target - goal.current).toLocaleString()} to go</span>
+            <span className="text-gray-500">
+              {calculatePercentage(goal.current, goal.target)}% complete
+            </span>
+            <span className="text-gray-500">
+              ₹{(goal.target - goal.current).toLocaleString()} to go
+            </span>
           </div>
         </div>
       ))}
@@ -57,6 +68,5 @@ export default function SavingsSummary() {
         Add New Goal
       </Button>
     </div>
-  )
+  );
 }
-

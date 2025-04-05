@@ -1,36 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { MessageSquare, X, Send, Bot, Sparkles } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { MessageSquare, X, Send, Bot, Sparkles } from "lucide-react";
 
 export default function ChatbotButton() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
       role: "bot",
-      content: "Hi there! I'm FinSavvy AI, your personal financial assistant. How can I help you today?",
+      content:
+        "Hi there! I'm Liquidpay, your personal financial assistant. How can I help you today?",
     },
-  ])
-  const [input, setInput] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
+  ]);
+  const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   const toggleChat = () => {
-    setIsOpen(!isOpen)
-  }
+    setIsOpen(!isOpen);
+  };
 
   const handleSend = (e) => {
-    e.preventDefault()
-    if (!input.trim()) return
+    e.preventDefault();
+    if (!input.trim()) return;
 
     // Add user message
-    const userMessage = { id: messages.length + 1, role: "user", content: input }
-    setMessages([...messages, userMessage])
-    setInput("")
-    setIsTyping(true)
+    const userMessage = {
+      id: messages.length + 1,
+      role: "user",
+      content: input,
+    };
+    setMessages([...messages, userMessage]);
+    setInput("");
+    setIsTyping(true);
 
     // Simulate AI response
     setTimeout(() => {
@@ -40,14 +51,19 @@ export default function ChatbotButton() {
         "Great question! Your current savings rate is 18%, which is above the recommended 15% for your age group.",
         "I've analyzed your accounts and found 3 subscriptions you haven't used in the last 2 months. Would you like to review them?",
         "Your investment portfolio is well-balanced, but you might want to consider increasing your exposure to index funds.",
-      ]
+      ];
 
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)]
-      const botMessage = { id: messages.length + 2, role: "bot", content: randomResponse }
-      setMessages((prevMessages) => [...prevMessages, botMessage])
-      setIsTyping(false)
-    }, 1500)
-  }
+      const randomResponse =
+        botResponses[Math.floor(Math.random() * botResponses.length)];
+      const botMessage = {
+        id: messages.length + 2,
+        role: "bot",
+        content: randomResponse,
+      };
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      setIsTyping(false);
+    }, 1500);
+  };
 
   return (
     <>
@@ -56,7 +72,11 @@ export default function ChatbotButton() {
         className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black z-50 flex items-center justify-center"
         size="icon"
       >
-        {isOpen ? <X className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
+        {isOpen ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <MessageSquare className="h-6 w-6" />
+        )}
       </Button>
 
       {isOpen && (
@@ -67,13 +87,23 @@ export default function ChatbotButton() {
               <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center mr-2">
                 <Bot className="h-4 w-4 text-yellow-500" />
               </div>
-              <CardTitle className="text-white text-lg">FinSavvy Assistant</CardTitle>
+              <CardTitle className="text-white text-lg">
+                Liquidpay Assistant
+              </CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="p-3 max-h-96 overflow-y-auto bg-gray-900" style={{ scrollBehavior: "smooth" }}>
+          <CardContent
+            className="p-3 max-h-96 overflow-y-auto bg-gray-900"
+            style={{ scrollBehavior: "smooth" }}
+          >
             <div className="space-y-4">
               {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
                   <div
                     className={`max-w-[85%] p-3 rounded-lg ${
                       message.role === "user"
@@ -112,17 +142,21 @@ export default function ChatbotButton() {
                 onChange={(e) => setInput(e.target.value)}
                 className="flex-1 bg-gray-800 border-gray-700 text-white focus-visible:ring-yellow-500"
               />
-              <Button type="submit" size="icon" className="bg-yellow-600 hover:bg-yellow-500 text-black">
+              <Button
+                type="submit"
+                size="icon"
+                className="bg-yellow-600 hover:bg-yellow-500 text-black"
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </form>
           </CardFooter>
           <div className="px-3 py-2 bg-gray-800 text-xs text-gray-400 flex items-center justify-center">
-            <Sparkles className="h-3 w-3 mr-1 text-yellow-500" /> Powered by FinSavvy AI
+            <Sparkles className="h-3 w-3 mr-1 text-yellow-500" /> Powered by
+            Liquidpay
           </div>
         </Card>
       )}
     </>
-  )
+  );
 }
-

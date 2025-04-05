@@ -1,106 +1,166 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Lock, CheckCircle, ChevronRight, Search, CreditCard, Building, Wallet, ArrowLeft, Shield } from "lucide-react"
+import { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Lock,
+  CheckCircle,
+  ChevronRight,
+  Search,
+  CreditCard,
+  Building,
+  Wallet,
+  ArrowLeft,
+  Shield,
+} from "lucide-react";
 
 const popularBanks = [
   { id: 1, name: "HDFC Bank", logo: "/placeholder.svg?height=40&width=40" },
   { id: 2, name: "ICICI Bank", logo: "/placeholder.svg?height=40&width=40" },
   { id: 3, name: "SBI", logo: "/placeholder.svg?height=40&width=40" },
   { id: 4, name: "Axis Bank", logo: "/placeholder.svg?height=40&width=40" },
-  { id: 5, name: "Kotak Mahindra", logo: "/placeholder.svg?height=40&width=40" },
+  {
+    id: 5,
+    name: "Kotak Mahindra",
+    logo: "/placeholder.svg?height=40&width=40",
+  },
   { id: 6, name: "Yes Bank", logo: "/placeholder.svg?height=40&width=40" },
-]
+];
 
 const allBanks = [
   ...popularBanks,
-  { id: 7, name: "Punjab National Bank", logo: "/placeholder.svg?height=40&width=40" },
-  { id: 8, name: "Bank of Baroda", logo: "/placeholder.svg?height=40&width=40" },
+  {
+    id: 7,
+    name: "Punjab National Bank",
+    logo: "/placeholder.svg?height=40&width=40",
+  },
+  {
+    id: 8,
+    name: "Bank of Baroda",
+    logo: "/placeholder.svg?height=40&width=40",
+  },
   { id: 9, name: "Canara Bank", logo: "/placeholder.svg?height=40&width=40" },
   { id: 10, name: "Union Bank", logo: "/placeholder.svg?height=40&width=40" },
-  { id: 11, name: "IndusInd Bank", logo: "/placeholder.svg?height=40&width=40" },
+  {
+    id: 11,
+    name: "IndusInd Bank",
+    logo: "/placeholder.svg?height=40&width=40",
+  },
   { id: 12, name: "IDBI Bank", logo: "/placeholder.svg?height=40&width=40" },
-]
+];
 
 export default function ConnectBankPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedBank, setSelectedBank] = useState(null)
-  const [step, setStep] = useState(1)
-  const [credentials, setCredentials] = useState({ username: "", password: "" })
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBank, setSelectedBank] = useState(null);
+  const [step, setStep] = useState(1);
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const filteredBanks = allBanks.filter((bank) => bank.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredBanks = allBanks.filter((bank) =>
+    bank.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleBankSelect = (bank) => {
-    setSelectedBank(bank)
-    setStep(2)
-  }
+    setSelectedBank(bank);
+    setStep(2);
+  };
 
   const handleCredentialsChange = (e) => {
-    const { name, value } = e.target
-    setCredentials((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleConnect = (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsLoading(false)
-      setStep(3)
-    }, 2000)
-  }
+      setIsLoading(false);
+      setStep(3);
+    }, 2000);
+  };
 
   const handleFinish = () => {
-    router.push("/dashboard")
-  }
+    router.push("/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-black pt-24 pb-16">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           {step > 1 && (
-            <Button variant="ghost" className="mb-6 text-gray-400 hover:text-white" onClick={() => setStep(step - 1)}>
+            <Button
+              variant="ghost"
+              className="mb-6 text-gray-400 hover:text-white"
+              onClick={() => setStep(step - 1)}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" /> Back
             </Button>
           )}
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Connect Your Bank</h1>
-            <p className="text-gray-400">Securely link your accounts to get personalized financial insights</p>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Connect Your Bank
+            </h1>
+            <p className="text-gray-400">
+              Securely link your accounts to get personalized financial insights
+            </p>
           </div>
 
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  step >= 1 ? "bg-yellow-600 text-black" : "bg-gray-700 text-gray-400"
+                  step >= 1
+                    ? "bg-yellow-600 text-black"
+                    : "bg-gray-700 text-gray-400"
                 }`}
               >
                 {step > 1 ? <CheckCircle className="h-5 w-5" /> : "1"}
               </div>
-              <div className={`h-1 w-16 ${step >= 2 ? "bg-yellow-600" : "bg-gray-700"}`}></div>
+              <div
+                className={`h-1 w-16 ${
+                  step >= 2 ? "bg-yellow-600" : "bg-gray-700"
+                }`}
+              ></div>
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  step >= 2 ? "bg-yellow-600 text-black" : "bg-gray-700 text-gray-400"
+                  step >= 2
+                    ? "bg-yellow-600 text-black"
+                    : "bg-gray-700 text-gray-400"
                 }`}
               >
                 {step > 2 ? <CheckCircle className="h-5 w-5" /> : "2"}
               </div>
-              <div className={`h-1 w-16 ${step >= 3 ? "bg-yellow-600" : "bg-gray-700"}`}></div>
+              <div
+                className={`h-1 w-16 ${
+                  step >= 3 ? "bg-yellow-600" : "bg-gray-700"
+                }`}
+              ></div>
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  step >= 3 ? "bg-yellow-600 text-black" : "bg-gray-700 text-gray-400"
+                  step >= 3
+                    ? "bg-yellow-600 text-black"
+                    : "bg-gray-700 text-gray-400"
                 }`}
               >
                 3
@@ -158,7 +218,9 @@ export default function ConnectBankPage() {
                                 />
                               </div>
                               <div>
-                                <h3 className="font-medium text-white">{bank.name}</h3>
+                                <h3 className="font-medium text-white">
+                                  {bank.name}
+                                </h3>
                               </div>
                             </div>
                             <ChevronRight className="h-5 w-5 text-gray-500" />
@@ -188,7 +250,9 @@ export default function ConnectBankPage() {
                                 />
                               </div>
                               <div>
-                                <h3 className="font-medium text-white">{bank.name}</h3>
+                                <h3 className="font-medium text-white">
+                                  {bank.name}
+                                </h3>
                               </div>
                             </div>
                             <ChevronRight className="h-5 w-5 text-gray-500" />
@@ -203,14 +267,15 @@ export default function ConnectBankPage() {
                 <div className="flex items-start mb-4">
                   <Shield className="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-400 text-sm">
-                    Your credentials are encrypted and never stored. We use read-only access to analyze your
-                    transactions.
+                    Your credentials are encrypted and never stored. We use
+                    read-only access to analyze your transactions.
                   </p>
                 </div>
                 <div className="flex items-start">
                   <Lock className="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-400 text-sm">
-                    We use bank-level 256-bit encryption to keep your information safe and secure.
+                    We use bank-level 256-bit encryption to keep your
+                    information safe and secure.
                   </p>
                 </div>
               </CardFooter>
@@ -231,8 +296,12 @@ export default function ConnectBankPage() {
                     />
                   </div>
                   <div>
-                    <CardTitle className="text-white">{selectedBank.name}</CardTitle>
-                    <CardDescription className="text-gray-400">Enter your online banking credentials</CardDescription>
+                    <CardTitle className="text-white">
+                      {selectedBank.name}
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Enter your online banking credentials
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -270,10 +339,13 @@ export default function ConnectBankPage() {
                     <div className="flex items-start">
                       <Shield className="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="text-white text-sm font-medium mb-1">Secure Connection</h4>
+                        <h4 className="text-white text-sm font-medium mb-1">
+                          Secure Connection
+                        </h4>
                         <p className="text-gray-400 text-sm">
-                          Your credentials are encrypted and never stored on our servers. We use read-only access to
-                          analyze your transactions.
+                          Your credentials are encrypted and never stored on our
+                          servers. We use read-only access to analyze your
+                          transactions.
                         </p>
                       </div>
                     </div>
@@ -297,7 +369,9 @@ export default function ConnectBankPage() {
                 <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="h-8 w-8 text-green-500" />
                 </div>
-                <CardTitle className="text-white text-2xl">Connection Successful!</CardTitle>
+                <CardTitle className="text-white text-2xl">
+                  Connection Successful!
+                </CardTitle>
                 <CardDescription className="text-gray-400">
                   Your bank account has been successfully connected
                 </CardDescription>
@@ -315,10 +389,16 @@ export default function ConnectBankPage() {
                       />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-white">{selectedBank.name}</h3>
-                      <p className="text-gray-400 text-sm">Connected just now</p>
+                      <h3 className="font-medium text-white">
+                        {selectedBank.name}
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Connected just now
+                      </p>
                     </div>
-                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Active</Badge>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                      Active
+                    </Badge>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -328,7 +408,9 @@ export default function ConnectBankPage() {
                           <Building className="h-5 w-5 text-yellow-500" />
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Checking Account</p>
+                          <p className="text-gray-400 text-xs">
+                            Checking Account
+                          </p>
                           <p className="text-white font-medium">•••• 4567</p>
                         </div>
                       </CardContent>
@@ -340,7 +422,9 @@ export default function ConnectBankPage() {
                           <Wallet className="h-5 w-5 text-yellow-500" />
                         </div>
                         <div>
-                          <p className="text-gray-400 text-xs">Savings Account</p>
+                          <p className="text-gray-400 text-xs">
+                            Savings Account
+                          </p>
                           <p className="text-white font-medium">•••• 7890</p>
                         </div>
                       </CardContent>
@@ -363,10 +447,13 @@ export default function ConnectBankPage() {
                     <div className="flex items-start">
                       <Shield className="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="text-white text-sm font-medium mb-1">What happens next?</h4>
+                        <h4 className="text-white text-sm font-medium mb-1">
+                          What happens next?
+                        </h4>
                         <p className="text-gray-400 text-sm">
-                          Our AI will analyze your transaction history to provide personalized insights and
-                          recommendations. This process may take a few minutes.
+                          Our AI will analyze your transaction history to
+                          provide personalized insights and recommendations.
+                          This process may take a few minutes.
                         </p>
                       </div>
                     </div>
@@ -386,6 +473,5 @@ export default function ConnectBankPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

@@ -1,7 +1,14 @@
-import Link from "next/link"
-import { Facebook, Instagram, Twitter, Linkedin, Github, Youtube } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import ChatbotButton from "@/components/chatbot-button"
+import Link from "next/link";
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Github,
+  Youtube,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ChatbotButton from "@/components/chatbot-button";
 
 const footerLinks = {
   features: [
@@ -32,7 +39,7 @@ const footerLinks = {
     { name: "API Documentation", href: "/api-docs" },
     { name: "Partners", href: "/partners" },
   ],
-}
+};
 
 export default function Footer() {
   return (
@@ -65,11 +72,12 @@ export default function Footer() {
                 <path d="M18.36 5.64l.7-.7" />
                 <circle cx="12" cy="12" r="4" />
               </svg>
-              <span className="text-xl font-bold text-white">FinSavvy AI</span>
+              <span className="text-xl font-bold text-white">Liquidpay</span>
             </div>
             <p className="text-gray-400 mb-6">
-              AI-powered financial assistant for better spending habits and savings discipline. Transform your financial
-              behavior with personalized insights and real-time nudges.
+              AI-powered financial assistant for better spending habits and
+              savings discipline. Transform your financial behavior with
+              personalized insights and real-time nudges.
             </p>
 
             <div className="flex flex-wrap gap-3 mb-6">
@@ -79,29 +87,50 @@ export default function Footer() {
                 </Button>
               </Link>
               <Link href="/connect-bank">
-                <Button variant="outline" className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800">
+                <Button
+                  variant="outline"
+                  className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+                >
                   Connect Bank
                 </Button>
               </Link>
             </div>
 
             <div className="flex space-x-4">
-              <Link href="#" className="text-gray-500 hover:text-yellow-400 transition-colors">
+              <Link
+                href="#"
+                className="text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 <Facebook size={20} />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-yellow-400 transition-colors">
+              <Link
+                href="#"
+                className="text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 <Instagram size={20} />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-yellow-400 transition-colors">
+              <Link
+                href="#"
+                className="text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 <Twitter size={20} />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-yellow-400 transition-colors">
+              <Link
+                href="#"
+                className="text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 <Linkedin size={20} />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-yellow-400 transition-colors">
+              <Link
+                href="#"
+                className="text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 <Github size={20} />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-yellow-400 transition-colors">
+              <Link
+                href="#"
+                className="text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 <Youtube size={20} />
               </Link>
             </div>
@@ -112,7 +141,10 @@ export default function Footer() {
             <ul className="space-y-4">
               {footerLinks.features.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-gray-400 hover:text-yellow-400 transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  >
                     {link.name}
                   </Link>
                 </li>
@@ -125,7 +157,10 @@ export default function Footer() {
             <ul className="space-y-4">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-gray-400 hover:text-yellow-400 transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  >
                     {link.name}
                   </Link>
                 </li>
@@ -138,13 +173,19 @@ export default function Footer() {
             <ul className="space-y-4">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-gray-400 hover:text-yellow-400 transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  >
                     {link.name}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/legal" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <Link
+                  href="/legal"
+                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                >
                   Legal
                 </Link>
               </li>
@@ -155,7 +196,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 text-sm mb-4 md:mb-0">
-              &copy; {new Date().getFullYear()} FinSavvy AI. All rights reserved.
+              &copy; {new Date().getFullYear()} Liquidpay. All rights reserved.
             </p>
             <div className="flex flex-wrap gap-4 text-sm">
               {footerLinks.legal.map((link, index) => (
@@ -174,6 +215,5 @@ export default function Footer() {
 
       <ChatbotButton />
     </footer>
-  )
+  );
 }
-

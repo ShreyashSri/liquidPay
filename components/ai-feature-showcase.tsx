@@ -1,17 +1,28 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MessageSquare, Bell, Zap, TrendingUp, ShoppingBag, CreditCard, ArrowRight, CheckCircle, X } from "lucide-react"
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  MessageSquare,
+  Bell,
+  Zap,
+  TrendingUp,
+  ShoppingBag,
+  CreditCard,
+  ArrowRight,
+  CheckCircle,
+  X,
+} from "lucide-react";
 
 const nudges = [
   {
     id: 1,
     title: "High Restaurant Spending",
-    message: "You've spent ₹4,500 on restaurants this month, which is 30% higher than your usual. Want to set a limit?",
+    message:
+      "You've spent ₹4,500 on restaurants this month, which is 30% higher than your usual. Want to set a limit?",
     time: "2 hours ago",
     type: "warning",
     icon: <ShoppingBag className="h-5 w-5" />,
@@ -19,7 +30,8 @@ const nudges = [
   {
     id: 2,
     title: "Subscription Renewal",
-    message: "Your Netflix subscription (₹499) will renew tomorrow. You haven't watched in 45 days. Cancel?",
+    message:
+      "Your Netflix subscription (₹499) will renew tomorrow. You haven't watched in 45 days. Cancel?",
     time: "1 day ago",
     type: "info",
     icon: <CreditCard className="h-5 w-5" />,
@@ -27,15 +39,20 @@ const nudges = [
   {
     id: 3,
     title: "Savings Milestone",
-    message: "Congrats! You've saved ₹10,000 this month. That's a new record! Keep it up!",
+    message:
+      "Congrats! You've saved ₹10,000 this month. That's a new record! Keep it up!",
     time: "3 days ago",
     type: "success",
     icon: <TrendingUp className="h-5 w-5" />,
   },
-]
+];
 
 const chatMessages = [
-  { id: 1, sender: "user", message: "How much did I spend on food last month?" },
+  {
+    id: 1,
+    sender: "user",
+    message: "How much did I spend on food last month?",
+  },
   {
     id: 2,
     sender: "ai",
@@ -49,10 +66,10 @@ const chatMessages = [
     message:
       "Based on your habits, I see you order food delivery 4-5 times per week. If you reduced this to 2 times per week, you could save approximately ₹4,000 per month. Would you like me to suggest some affordable meal prep ideas?",
   },
-]
+];
 
 export default function AiFeatureShowcase() {
-  const [activeTab, setActiveTab] = useState("nudges")
+  const [activeTab, setActiveTab] = useState("nudges");
 
   return (
     <section className="w-full py-20 bg-black relative overflow-hidden">
@@ -63,7 +80,9 @@ export default function AiFeatureShowcase() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">AI Features</Badge>
+          <Badge className="mb-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+            AI Features
+          </Badge>
           <h2 className="text-4xl font-bold mb-4 text-white">
             Smart Financial{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
@@ -77,18 +96,31 @@ export default function AiFeatureShowcase() {
 
         <div className="flex flex-col lg:flex-row items-center gap-12">
           <div className="lg:w-1/2 order-2 lg:order-1">
-            <Tabs defaultValue="nudges" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              defaultValue="nudges"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="bg-gray-800 p-1 mb-6">
                 <TabsTrigger
                   value="nudges"
-                  className={`${activeTab === "nudges" ? "bg-gray-700 text-white" : "text-gray-400"} px-6 py-2`}
+                  className={`${
+                    activeTab === "nudges"
+                      ? "bg-gray-700 text-white"
+                      : "text-gray-400"
+                  } px-6 py-2`}
                 >
                   <Bell className="h-4 w-4 mr-2" />
                   Smart Nudges
                 </TabsTrigger>
                 <TabsTrigger
                   value="chat"
-                  className={`${activeTab === "chat" ? "bg-gray-700 text-white" : "text-gray-400"} px-6 py-2`}
+                  className={`${
+                    activeTab === "chat"
+                      ? "bg-gray-700 text-white"
+                      : "text-gray-400"
+                  } px-6 py-2`}
                 >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   AI Chat
@@ -106,8 +138,8 @@ export default function AiFeatureShowcase() {
                             nudge.type === "warning"
                               ? "bg-yellow-500/10 border-yellow-500/30"
                               : nudge.type === "success"
-                                ? "bg-green-500/10 border-green-500/30"
-                                : "bg-blue-500/10 border-blue-500/30"
+                              ? "bg-green-500/10 border-green-500/30"
+                              : "bg-blue-500/10 border-blue-500/30"
                           }`}
                         >
                           <div className="flex space-x-3">
@@ -117,20 +149,27 @@ export default function AiFeatureShowcase() {
                                   nudge.type === "warning"
                                     ? "bg-yellow-500/20"
                                     : nudge.type === "success"
-                                      ? "bg-green-500/20"
-                                      : "bg-blue-500/20"
+                                    ? "bg-green-500/20"
+                                    : "bg-blue-500/20"
                                 }`}
                               >
                                 {nudge.icon}
                               </div>
                             </div>
                             <div className="flex-1">
-                              <h4 className="text-sm font-medium text-white mb-1">{nudge.title}</h4>
-                              <p className="text-xs text-gray-400 mb-3">{nudge.message}</p>
+                              <h4 className="text-sm font-medium text-white mb-1">
+                                {nudge.title}
+                              </h4>
+                              <p className="text-xs text-gray-400 mb-3">
+                                {nudge.message}
+                              </p>
                               <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500">{nudge.time}</span>
+                                <span className="text-xs text-gray-500">
+                                  {nudge.time}
+                                </span>
                                 <div className="flex space-x-2">
-                                  {nudge.type === "warning" || nudge.type === "info" ? (
+                                  {nudge.type === "warning" ||
+                                  nudge.type === "info" ? (
                                     <>
                                       <Button
                                         variant="outline"
@@ -143,7 +182,8 @@ export default function AiFeatureShowcase() {
                                         size="sm"
                                         className="h-7 px-2 text-xs bg-yellow-600 hover:bg-yellow-500 text-white"
                                       >
-                                        <CheckCircle className="h-3 w-3 mr-1" /> Take Action
+                                        <CheckCircle className="h-3 w-3 mr-1" />{" "}
+                                        Take Action
                                       </Button>
                                     </>
                                   ) : (
@@ -151,7 +191,8 @@ export default function AiFeatureShowcase() {
                                       size="sm"
                                       className="h-7 px-2 text-xs bg-green-600 hover:bg-green-500 text-white"
                                     >
-                                      <CheckCircle className="h-3 w-3 mr-1" /> Acknowledge
+                                      <CheckCircle className="h-3 w-3 mr-1" />{" "}
+                                      Acknowledge
                                     </Button>
                                   )}
                                 </div>
@@ -172,7 +213,11 @@ export default function AiFeatureShowcase() {
                       {chatMessages.map((message) => (
                         <div
                           key={message.id}
-                          className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                          className={`flex ${
+                            message.sender === "user"
+                              ? "justify-end"
+                              : "justify-start"
+                          }`}
                         >
                           <div
                             className={`max-w-[80%] p-3 rounded-lg ${
@@ -205,10 +250,13 @@ export default function AiFeatureShowcase() {
 
           <div className="lg:w-1/2 order-1 lg:order-2">
             <div className="text-left">
-              <h3 className="text-3xl font-bold mb-4 text-white">AI-Powered Financial Guidance</h3>
+              <h3 className="text-3xl font-bold mb-4 text-white">
+                AI-Powered Financial Guidance
+              </h3>
               <p className="text-gray-400 mb-6">
-                Our intelligent assistant analyzes your spending patterns and provides personalized recommendations to
-                help you save money and build better financial habits.
+                Our intelligent assistant analyzes your spending patterns and
+                provides personalized recommendations to help you save money and
+                build better financial habits.
               </p>
 
               <div className="space-y-4 mb-8">
@@ -217,9 +265,12 @@ export default function AiFeatureShowcase() {
                     <Bell className="h-5 w-5 text-yellow-500" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-medium text-white mb-1">Real-time Nudges</h4>
+                    <h4 className="text-lg font-medium text-white mb-1">
+                      Real-time Nudges
+                    </h4>
                     <p className="text-gray-400 text-sm">
-                      Receive timely notifications that help you make better financial decisions in the moment.
+                      Receive timely notifications that help you make better
+                      financial decisions in the moment.
                     </p>
                   </div>
                 </div>
@@ -229,9 +280,12 @@ export default function AiFeatureShowcase() {
                     <MessageSquare className="h-5 w-5 text-yellow-500" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-medium text-white mb-1">Conversational AI</h4>
+                    <h4 className="text-lg font-medium text-white mb-1">
+                      Conversational AI
+                    </h4>
                     <p className="text-gray-400 text-sm">
-                      Chat with our AI assistant to get insights about your spending and personalized advice.
+                      Chat with our AI assistant to get insights about your
+                      spending and personalized advice.
                     </p>
                   </div>
                 </div>
@@ -241,9 +295,12 @@ export default function AiFeatureShowcase() {
                     <TrendingUp className="h-5 w-5 text-yellow-500" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-medium text-white mb-1">Behavioral Analysis</h4>
+                    <h4 className="text-lg font-medium text-white mb-1">
+                      Behavioral Analysis
+                    </h4>
                     <p className="text-gray-400 text-sm">
-                      Get insights into your spending habits and learn how to improve your financial behavior.
+                      Get insights into your spending habits and learn how to
+                      improve your financial behavior.
                     </p>
                   </div>
                 </div>
@@ -257,6 +314,5 @@ export default function AiFeatureShowcase() {
         </div>
       </div>
     </section>
-  )
+  );
 }
-

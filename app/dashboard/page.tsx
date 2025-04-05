@@ -1,13 +1,31 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { BarChart, LineChart, PieChart, ChartContainer } from "@/components/ui/chart"
-import { ArrowUpRight, ArrowDownRight, TrendingUp, Wallet, CreditCard, AlertCircle } from "lucide-react"
-import RecentTransactions from "@/components/dashboard/recent-transactions"
-import SpendingAlerts from "@/components/dashboard/spending-alerts"
-import SavingsSummary from "@/components/dashboard/savings-summary"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  BarChart,
+  LineChart,
+  PieChart,
+  ChartContainer,
+} from "@/components/ui/chart";
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  TrendingUp,
+  Wallet,
+  CreditCard,
+  AlertCircle,
+} from "lucide-react";
+import RecentTransactions from "@/components/dashboard/recent-transactions";
+import SpendingAlerts from "@/components/dashboard/spending-alerts";
+import SavingsSummary from "@/components/dashboard/savings-summary";
 
 // Mock data
 const monthlySpending = [
@@ -17,7 +35,7 @@ const monthlySpending = [
   { month: "Apr", amount: 5100 },
   { month: "May", amount: 4300 },
   { month: "Jun", amount: 4700 },
-]
+];
 
 const categoryData = [
   { name: "Food", value: 35, color: "#ffd700" },
@@ -25,7 +43,7 @@ const categoryData = [
   { name: "Shopping", value: 15, color: "#9c9c9c" },
   { name: "Transport", value: 10, color: "#787878" },
   { name: "Bills", value: 20, color: "#505050" },
-]
+];
 
 const weeklyData = [
   { day: "Mon", needs: 500, wants: 300 },
@@ -35,7 +53,7 @@ const weeklyData = [
   { day: "Fri", needs: 700, wants: 500 },
   { day: "Sat", needs: 400, wants: 600 },
   { day: "Sun", needs: 350, wants: 450 },
-]
+];
 
 export default function DashboardPage() {
   return (
@@ -44,7 +62,9 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
-            <p className="text-gray-400">Welcome back! Here's your financial overview.</p>
+            <p className="text-gray-400">
+              Welcome back! Here's your financial overview.
+            </p>
           </div>
           <Button className="mt-4 md:mt-0 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black">
             Connect Bank Account
@@ -55,7 +75,9 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="pb-2">
-              <CardDescription className="text-gray-400">Total Balance</CardDescription>
+              <CardDescription className="text-gray-400">
+                Total Balance
+              </CardDescription>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-2xl text-white">₹42,500</CardTitle>
                 <Wallet className="h-5 w-5 text-yellow-500" />
@@ -71,7 +93,9 @@ export default function DashboardPage() {
 
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="pb-2">
-              <CardDescription className="text-gray-400">Monthly Spending</CardDescription>
+              <CardDescription className="text-gray-400">
+                Monthly Spending
+              </CardDescription>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-2xl text-white">₹15,200</CardTitle>
                 <CreditCard className="h-5 w-5 text-yellow-500" />
@@ -87,7 +111,9 @@ export default function DashboardPage() {
 
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="pb-2">
-              <CardDescription className="text-gray-400">Savings Rate</CardDescription>
+              <CardDescription className="text-gray-400">
+                Savings Rate
+              </CardDescription>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-2xl text-white">24%</CardTitle>
                 <TrendingUp className="h-5 w-5 text-yellow-500" />
@@ -103,7 +129,9 @@ export default function DashboardPage() {
 
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="pb-2">
-              <CardDescription className="text-gray-400">Spending Alerts</CardDescription>
+              <CardDescription className="text-gray-400">
+                Spending Alerts
+              </CardDescription>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-2xl text-white">3</CardTitle>
                 <AlertCircle className="h-5 w-5 text-yellow-500" />
@@ -123,7 +151,9 @@ export default function DashboardPage() {
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
                 <CardTitle className="text-white">Spending Overview</CardTitle>
-                <CardDescription className="text-gray-400">Your spending patterns over time</CardDescription>
+                <CardDescription className="text-gray-400">
+                  Your spending patterns over time
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="monthly">
@@ -165,8 +195,12 @@ export default function DashboardPage() {
 
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Recent Transactions</CardTitle>
-                <CardDescription className="text-gray-400">Your latest financial activities</CardDescription>
+                <CardTitle className="text-white">
+                  Recent Transactions
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Your latest financial activities
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <RecentTransactions />
@@ -177,8 +211,12 @@ export default function DashboardPage() {
           <div className="space-y-8">
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Spending by Category</CardTitle>
-                <CardDescription className="text-gray-400">Where your money goes</CardDescription>
+                <CardTitle className="text-white">
+                  Spending by Category
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Where your money goes
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-80">
@@ -199,7 +237,9 @@ export default function DashboardPage() {
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
                 <CardTitle className="text-white">Spending Alerts</CardTitle>
-                <CardDescription className="text-gray-400">AI-powered notifications to help you save</CardDescription>
+                <CardDescription className="text-gray-400">
+                  AI-powered notifications to help you save
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <SpendingAlerts />
@@ -209,7 +249,9 @@ export default function DashboardPage() {
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
                 <CardTitle className="text-white">Savings Summary</CardTitle>
-                <CardDescription className="text-gray-400">Progress towards your financial goals</CardDescription>
+                <CardDescription className="text-gray-400">
+                  Progress towards your financial goals
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <SavingsSummary />
@@ -219,6 +261,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

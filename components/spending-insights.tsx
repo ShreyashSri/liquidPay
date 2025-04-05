@@ -1,8 +1,19 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BarChart, LineChart, PieChart, ChartContainer } from "@/components/ui/chart"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  BarChart,
+  LineChart,
+  PieChart,
+  ChartContainer,
+} from "@/components/ui/chart";
 
 const spendingData = [
   { name: "Food", value: 35, color: "#ffd700" },
@@ -10,7 +21,7 @@ const spendingData = [
   { name: "Shopping", value: 15, color: "#9c9c9c" },
   { name: "Transport", value: 10, color: "#787878" },
   { name: "Bills", value: 20, color: "#505050" },
-]
+];
 
 const monthlyData = [
   { month: "Jan", needs: 1200, wants: 800 },
@@ -19,7 +30,7 @@ const monthlyData = [
   { month: "Apr", needs: 1250, wants: 650 },
   { month: "May", needs: 1400, wants: 600 },
   { month: "Jun", needs: 1350, wants: 500 },
-]
+];
 
 const weeklySpending = [
   { day: "Mon", amount: 45 },
@@ -29,14 +40,16 @@ const weeklySpending = [
   { day: "Fri", amount: 150 },
   { day: "Sat", amount: 180 },
   { day: "Sun", amount: 90 },
-]
+];
 
 export default function SpendingInsights() {
   return (
     <section className="w-full py-20 bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-white">Spending Insights</h2>
+          <h2 className="text-4xl font-bold mb-4 text-white">
+            Spending Insights
+          </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Visualize your spending patterns and identify opportunities to save
           </p>
@@ -53,8 +66,12 @@ export default function SpendingInsights() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card className="bg-gray-800 border-gray-700 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-white">Spending Categories</CardTitle>
-                  <CardDescription className="text-gray-400">Breakdown of your spending by category</CardDescription>
+                  <CardTitle className="text-white">
+                    Spending Categories
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Breakdown of your spending by category
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
@@ -100,7 +117,9 @@ export default function SpendingInsights() {
           <TabsContent value="monthly">
             <Card className="bg-gray-800 border-gray-700 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-white">Monthly Spending Trend</CardTitle>
+                <CardTitle className="text-white">
+                  Monthly Spending Trend
+                </CardTitle>
                 <CardDescription className="text-gray-400">
                   Track your spending patterns over the past 6 months
                 </CardDescription>
@@ -126,7 +145,9 @@ export default function SpendingInsights() {
             <Card className="bg-gray-800 border-gray-700 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-white">Weekly Spending</CardTitle>
-                <CardDescription className="text-gray-400">Your spending pattern throughout the week</CardDescription>
+                <CardDescription className="text-gray-400">
+                  Your spending pattern throughout the week
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-96">
@@ -147,6 +168,5 @@ export default function SpendingInsights() {
         </Tabs>
       </div>
     </section>
-  )
+  );
 }
-

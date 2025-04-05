@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 // Mock transaction data
 const transactions = [
@@ -56,38 +56,45 @@ const transactions = [
     category: "Bills",
     type: "expense",
   },
-]
+];
 
 export async function GET(request: Request) {
   // In a real app, you would authenticate the user and filter by userId
   // For this demo, we'll return all transactions
 
-  const { searchParams } = new URL(request.url)
-  const limit = searchParams.get("limit")
-  const category = searchParams.get("category")
+  const { searchParams } = new URL(request.url);
+  const limit = searchParams.get("limit");
+  const category = searchParams.get("category");
 
-  let filteredTransactions = [...transactions]
+  let filteredTransactions = [...transactions];
 
   if (category) {
     filteredTransactions = filteredTransactions.filter(
-      (transaction) => transaction.category.toLowerCase() === category.toLowerCase(),
-    )
+      (transaction) =>
+        transaction.category.toLowerCase() === category.toLowerCase()
+    );
   }
 
   if (limit) {
-    filteredTransactions = filteredTransactions.slice(0, Number.parseInt(limit))
+    filteredTransactions = filteredTransactions.slice(
+      0,
+      Number.parseInt(limit)
+    );
   }
 
-  return NextResponse.json(filteredTransactions)
+  return NextResponse.json(filteredTransactions);
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate required fields
     if (!body.name || !body.amount || !body.category) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     // In a real app, you would save to a database
@@ -100,11 +107,13 @@ export async function POST(request: Request) {
       amount: body.amount,
       category: body.category,
       type: body.amount > 0 ? "income" : "expense",
-    }
+    };
 
-    return NextResponse.json(newTransaction, { status: 201 })
+    return NextResponse.json(newTransaction, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create transaction" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to create transaction" },
+      { status: 500 }
+    );
   }
 }
-

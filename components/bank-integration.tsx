@@ -1,31 +1,61 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Lock, CheckCircle, ChevronRight } from "lucide-react"
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Lock, CheckCircle, ChevronRight } from "lucide-react";
 
 const banks = [
-  { id: 1, name: "HDFC Bank", logo: "/placeholder.svg?height=40&width=40", connected: false },
-  { id: 2, name: "ICICI Bank", logo: "/placeholder.svg?height=40&width=40", connected: false },
-  { id: 3, name: "SBI", logo: "/placeholder.svg?height=40&width=40", connected: false },
-  { id: 4, name: "Axis Bank", logo: "/placeholder.svg?height=40&width=40", connected: false },
-  { id: 5, name: "Kotak Mahindra", logo: "/placeholder.svg?height=40&width=40", connected: false },
-  { id: 6, name: "Yes Bank", logo: "/placeholder.svg?height=40&width=40", connected: false },
-]
+  {
+    id: 1,
+    name: "HDFC Bank",
+    logo: "/placeholder.svg?height=40&width=40",
+    connected: false,
+  },
+  {
+    id: 2,
+    name: "ICICI Bank",
+    logo: "/placeholder.svg?height=40&width=40",
+    connected: false,
+  },
+  {
+    id: 3,
+    name: "SBI",
+    logo: "/placeholder.svg?height=40&width=40",
+    connected: false,
+  },
+  {
+    id: 4,
+    name: "Axis Bank",
+    logo: "/placeholder.svg?height=40&width=40",
+    connected: false,
+  },
+  {
+    id: 5,
+    name: "Kotak Mahindra",
+    logo: "/placeholder.svg?height=40&width=40",
+    connected: false,
+  },
+  {
+    id: 6,
+    name: "Yes Bank",
+    logo: "/placeholder.svg?height=40&width=40",
+    connected: false,
+  },
+];
 
 export default function BankIntegration() {
-  const [connectedBanks, setConnectedBanks] = useState<number[]>([])
+  const [connectedBanks, setConnectedBanks] = useState<number[]>([]);
 
   const toggleConnection = (bankId: number) => {
     if (connectedBanks.includes(bankId)) {
-      setConnectedBanks(connectedBanks.filter((id) => id !== bankId))
+      setConnectedBanks(connectedBanks.filter((id) => id !== bankId));
     } else {
-      setConnectedBanks([...connectedBanks, bankId])
+      setConnectedBanks([...connectedBanks, bankId]);
     }
-  }
+  };
 
   return (
     <section className="w-full py-20 bg-black relative overflow-hidden">
@@ -37,7 +67,9 @@ export default function BankIntegration() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           <div className="lg:w-1/2">
-            <Badge className="mb-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">Secure Integration</Badge>
+            <Badge className="mb-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+              Secure Integration
+            </Badge>
             <h2 className="text-4xl font-bold mb-6 text-white">
               Connect Your Bank Accounts{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
@@ -45,14 +77,15 @@ export default function BankIntegration() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 mb-6">
-              Link your accounts to get personalized insights and recommendations. Your data is encrypted and never
-              shared.
+              Link your accounts to get personalized insights and
+              recommendations. Your data is encrypted and never shared.
             </p>
 
             <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-4 mb-8 flex items-center">
               <Lock className="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0" />
               <p className="text-gray-400 text-sm">
-                We use bank-level 256-bit encryption to keep your information safe and secure.
+                We use bank-level 256-bit encryption to keep your information
+                safe and secure.
               </p>
             </div>
 
@@ -87,7 +120,9 @@ export default function BankIntegration() {
                       <div>
                         <h3 className="font-medium text-white">{bank.name}</h3>
                         <p className="text-xs text-gray-400">
-                          {connectedBanks.includes(bank.id) ? "Connected" : "Click to connect"}
+                          {connectedBanks.includes(bank.id)
+                            ? "Connected"
+                            : "Click to connect"}
                         </p>
                       </div>
                     </div>
@@ -104,6 +139,5 @@ export default function BankIntegration() {
         </div>
       </div>
     </section>
-  )
+  );
 }
-
