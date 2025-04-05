@@ -2,6 +2,7 @@ import User from '../models/user.model.js';
 import Goal from '../models/goal.model.js';
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import dotenv from "dotenv";
+import { buyCodi } from '../blockchain/codiService.js';
 dotenv.config();
 
 export const genGoals = async (req, res) => {
@@ -58,26 +59,43 @@ export const completeGoal = async (req, res) => {
 };
 
 export const dailyGoalPurgeAndReward = async (req, res) => {
+    const { userId } = req.params;
+
     try {
-        const users = await User.find();
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: "❌ User not found" });
 
-        for (const user of users) {
-            const completedGoals = await Goal.find({ userId: user._id });
-
-            const completedCount = 5-(completedGoals.length);
-            const reward = completedCount * 5;
-
-            user.saveITCoin += reward;
-            await user.save();
-
-            await Goal.deleteMany({ userId: user._id });
-
-            // Optionally: regenerate goals here
+        if (!user.walletAddress) {
+            return res.status(400).json({ message: "⚠️ No wallet address found. No SIT reward given." });
         }
 
-        res.status(200).json({ message: "🧹 Goals purged & rewards given" });
+        const remainingGoals = await Goal.find({ userId: user._id });
+        const completedCount = 5 - remainingGoals.length;
+
+        if (completedCount <= 0) {
+            await Goal.deleteMany({ userId }); // still purge if needed
+            return res.status(200).json({ message: "No goals completed today. Purged existing goals." });
+        }
+
+        const reward = completedCount * 5;
+        
+        // Reward user with SIT tokens
+        const tx = await buyCodi(user.walletID, reward);
+        if (!tx) {
+            return res.status(500).json({ message: "❌ Failed to send SIT tokens" });
+        }
+
+        user.saveITCoin += reward;
+
+        await Goal.deleteMany({ userId });
+
+        res.status(200).json({
+            message: `✅ Rewarded ${reward} SIT tokens for ${completedCount} completed goals`,
+            txHash: tx?.transactionHash || "N/A"
+        });
+
     } catch (err) {
+        console.error("Purge & reward error:", err);
         res.status(500).json({ message: "❌ Daily purge failed", error: err.message });
     }
 };
-

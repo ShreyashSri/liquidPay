@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   age: {type: Number, required: true},
   saveITCoin: {type: Number, default: 0},
+  walletID: {type: String, unique: true},
   createdAt: { type: Date, default: Date.now },
   lastLoggedIn: { type: Date, default: Date.now },
   isVerified: { type: Boolean, default: false },
