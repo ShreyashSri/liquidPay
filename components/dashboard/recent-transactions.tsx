@@ -1,103 +1,134 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+"use client"
 
-export function RecentTransactions() {
-  const transactions = [
-    {
-      id: "TX123456",
-      type: "Buy",
-      creditType: "Renewable Energy",
-      amount: 500,
-      price: 28.5,
-      total: 14250,
-      counterparty: "EcoSolutions Corp",
-      date: "2023-06-15T10:30:00",
-    },
-    {
-      id: "TX123457",
-      type: "Sell",
-      creditType: "Forest Conservation",
-      amount: 300,
-      price: 32.75,
-      total: 9825,
-      counterparty: "Green Investments Ltd",
-      date: "2023-06-14T14:45:00",
-    },
-    {
-      id: "TX123458",
-      type: "Buy",
-      creditType: "Methane Capture",
-      amount: 750,
-      price: 19.25,
-      total: 14437.5,
-      counterparty: "CleanAir Technologies",
-      date: "2023-06-12T09:15:00",
-    },
-    {
-      id: "TX123459",
-      type: "Sell",
-      creditType: "Wind Energy",
-      amount: 200,
-      price: 24.5,
-      total: 4900,
-      counterparty: "Sustainable Future Inc",
-      date: "2023-06-10T16:20:00",
-    },
-  ]
+import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ArrowUpRight, ArrowDownRight, Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
+
+// Mock transaction data
+const transactions = [
+  {
+    id: 1,
+    name: "Starbucks Coffee",
+    date: "2023-11-15",
+    amount: -450,
+    category: "Food",
+    type: "expense",
+  },
+  {
+    id: 2,
+    name: "Amazon Purchase",
+    date: "2023-11-14",
+    amount: -2500,
+    category: "Shopping",
+    type: "expense",
+  },
+  {
+    id: 3,
+    name: "Salary Deposit",
+    date: "2023-11-10",
+    amount: 45000,
+    category: "Income",
+    type: "income",
+  },
+  {
+    id: 4,
+    name: "Movie Tickets",
+    date: "2023-11-08",
+    amount: -800,
+    category: "Entertainment",
+    type: "expense",
+  },
+  {
+    id: 5,
+    name: "Uber Ride",
+    date: "2023-11-07",
+    amount: -350,
+    category: "Transport",
+    type: "expense",
+  },
+  {
+    id: 6,
+    name: "Electricity Bill",
+    date: "2023-11-05",
+    amount: -1200,
+    category: "Bills",
+    type: "expense",
+  },
+]
+
+export default function RecentTransactions() {
+  const [searchTerm, setSearchTerm] = useState("")
+
+  const filteredTransactions = transactions.filter(
+    (transaction) =>
+      transaction.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction.category.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Transactions</CardTitle>
-        <CardDescription>Your latest trading activity</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Transaction ID</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Credit Type</TableHead>
-              <TableHead>Counterparty</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-right">Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.map((tx) => (
-              <TableRow key={tx.id}>
-                <TableCell className="font-medium">{tx.id}</TableCell>
-                <TableCell>
-                  <Badge variant={tx.type === "Buy" ? "default" : "secondary"}>{tx.type}</Badge>
-                </TableCell>
-                <TableCell>{tx.creditType}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback className="text-xs">
-                        {tx.counterparty
-                          .split(" ")
-                          .map((name) => name[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{tx.counterparty}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">{tx.amount}</TableCell>
-                <TableCell className="text-right">${tx.price.toFixed(2)}</TableCell>
-                <TableCell className="text-right">${tx.total.toFixed(2)}</TableCell>
-                <TableCell className="text-right">{new Date(tx.date).toLocaleDateString()}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <Input
+          placeholder="Search transactions..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 bg-gray-700 border-gray-600 text-white"
+        />
+      </div>
+
+      <div className="space-y-4">
+        {filteredTransactions.length > 0 ? (
+          filteredTransactions.map((transaction) => (
+            <div
+              key={transaction.id}
+              className="flex items-center justify-between p-3 rounded-lg bg-gray-700 hover:bg-gray-650 transition-colors"
+            >
+              <div className="flex items-center space-x-4">
+                <div
+                  className={`p-2 rounded-full ${transaction.type === "income" ? "bg-green-500/20" : "bg-red-500/20"}`}
+                >
+                  {transaction.type === "income" ? (
+                    <ArrowUpRight className="h-5 w-5 text-green-500" />
+                  ) : (
+                    <ArrowDownRight className="h-5 w-5 text-red-500" />
+                  )}
+                </div>
+                <div>
+                  <p className="font-medium text-white">{transaction.name}</p>
+                  <p className="text-sm text-gray-400">{formatDate(transaction.date)}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className={`font-medium ${transaction.type === "income" ? "text-green-500" : "text-white"}`}>
+                  {transaction.type === "income" ? "+" : ""}₹{Math.abs(transaction.amount).toLocaleString()}
+                </p>
+                <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600">
+                  {transaction.category}
+                </Badge>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-6">
+            <p className="text-gray-400">No transactions found</p>
+          </div>
+        )}
+      </div>
+
+      <div className="text-center">
+        <Button variant="outline" className="text-gray-300 border-gray-600 hover:bg-gray-700">
+          View All Transactions
+        </Button>
+      </div>
+    </div>
   )
 }
 

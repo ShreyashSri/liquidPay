@@ -1,15 +1,13 @@
 import type { Config } from "tailwindcss"
 
-const config = {
+const config: Config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "*.{js,ts,jsx,tsx,mdx}",
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -53,6 +51,30 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        gold: {
+          50: "#fff9e6",
+          100: "#ffefc0",
+          200: "#ffe799",
+          300: "#ffdf73",
+          400: "#ffd74d",
+          500: "#ffd026",
+          600: "#ffc300",
+          700: "#e6b000",
+          800: "#cc9c00",
+          900: "#b38800",
+        },
+        silver: {
+          50: "#f7f7f7",
+          100: "#e3e3e3",
+          200: "#c8c8c8",
+          300: "#a4a4a4",
+          400: "#818181",
+          500: "#666666",
+          600: "#515151",
+          700: "#434343",
+          800: "#383838",
+          900: "#313131",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -73,13 +95,10 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-      },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+}
 
 export default config
 

@@ -1,39 +1,32 @@
 import type React from "react"
-import type { Metadata } from "next"
-import { Mona_Sans as FontSans } from "next/font/google"
 import "./globals.css"
-import { cn } from "@/lib/utils"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import Sidebar from "@/components/layout/sidebar"
-import Header from "@/components/layout/header"
+import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "CarbonBid - Tokenized Carbon Credit Marketplace",
-  description: "Trade carbon credits with AI-powered forecasting and blockchain technology",
+  title: "FinSavvy AI - Financial Behavior Modification",
+  description:
+    "AI-powered financial assistant that helps young adults curb impulse spending and build savings discipline",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <div className="flex h-screen overflow-hidden">
-            <Sidebar />
-            <div className="flex flex-col flex-1 overflow-hidden">
-              <Header />
-              <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
-            </div>
-          </div>
+      <body className={`${inter.className} bg-black text-white`}>
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <Navbar />
+          {children}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
