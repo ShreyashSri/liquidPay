@@ -1,5 +1,5 @@
 import User from '../models/user.model.js';
-import Goal from '../models/goal.model.js';
+import Goal from '../models/goals.model.js';
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import dotenv from "dotenv";
 import { buyCodi } from '../blockchain/codiService.js';

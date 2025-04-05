@@ -2,23 +2,17 @@
 
 import type React from "react";
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import axios from "axios"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,22 +23,30 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+    e.preventDefault()
+    setError("")
+    setIsLoading(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const { data } = await axios.post('http://localhost:8188/api/auth/login', {
+        email,
+        password
+      }, {
+        withCredentials: true
+      });
 
-      // Simple validation for demo purposes
-      if (email === "demo@liquidpay" && password === "password") {
-        router.push("/dashboard");
+      // If login is successful, redirect to dashboard
+      router.push('/dashboard');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.msg || 'Login failed');
       } else {
-        setError("Invalid email or password. Try demo@liquidpay / password");
+        setError('An error occurred during login');
       }
-    }, 1500);
-  };
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const handleSocialLogin = (provider: string) => {
     setIsLoading(true);

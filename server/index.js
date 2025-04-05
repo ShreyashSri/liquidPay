@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes.js';
+import blockChainRoutes from './routes/blockchain.routes.js';
+import goalRoutes from './routes/goals.routes.js';
+import txRoutes from './routes/transaction.routes.js';
 import mongoose from 'mongoose';
 import { buyCodi, getBalance } from "./blockchain/codiService.js";
 import cookieParser from 'cookie-parser';
@@ -10,12 +13,15 @@ const app = express();
 
 dotenv.config();
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: ['http://localhost:3000', 'http://localhost:5173'],
     credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRoutes);
+app.use('/api/web3', blockChainRoutes);
+app.use('/api/goals', goalRoutes);
+app.use('/api/transactions', txRoutes);
 
 try {
     mongoose.connect(process.env.MONGODB_URI, {
@@ -29,26 +35,7 @@ try {
     console.error(error)
 }
 
-app.get("/balance/:address", async (req, res) => {
-    try {
-        const balance = await getBalance(req.params.address);
-        res.json({ address: req.params.address, balance });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 
-
-
-app.post("/buy", async (req, res) => {
-    const { to, amount } = req.body;
-    try {
-        const txHash = await buyCodi(to, amount);
-        res.json({ txHash });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 
 app.listen(process.env.PORT || 8180, () => {
     console.log(`Server is running on port ${process.env.PORT || 8180}`);

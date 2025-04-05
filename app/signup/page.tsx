@@ -2,42 +2,33 @@
 
 import type React from "react";
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Eye,
-  EyeOff,
-  CheckCircle2,
-  User,
-  Mail,
-  Lock,
-  AlertCircle,
-} from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Eye, EyeOff, CheckCircle2, User, Mail, Lock, AlertCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { GiWallet } from "react-icons/gi";
+import { MdManageAccounts } from "react-icons/md";
+import axios from 'axios'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
+    age: "",
     email: "",
     password: "",
     confirmPassword: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
+    metamaskWalletId: "",
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,21 +38,34 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    // Validate passwords match
+  
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
+  
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
+  
+    try {
+      const res = await axios.post("http://localhost:8188/api/auth/register", {
+        fullname: formData.name,
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        age: formData.age,
+        walletAddress: formData.metamaskWalletId || "0x0000000000000000000000000000000000000000",
+      });
+    
+      const data = res.data;
+    
+      // ✅ Redirect to verify page after success
+      router.push("/verify-email");
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || "Something went wrong");
+    } finally {
       setIsLoading(false);
-      router.push("/onboarding");
-    }, 1500);
-  };
+    }
+  }
 
   const handleSocialSignup = (provider: string) => {
     setIsLoading(true);
@@ -148,6 +152,46 @@ export default function SignupPage() {
                     name="name"
                     placeholder="John Doe"
                     value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="bg-gray-800/50 border-gray-700 text-white pl-10 focus-visible:ring-yellow-500"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-gray-300">
+                  Username
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    <User className="h-4 w-4" />
+                  </div>
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="john_doe"
+                    value={formData.username}
+                    onChange={handleChange}
+                    required
+                    className="bg-gray-800/50 border-gray-700 text-white pl-10 focus-visible:ring-yellow-500"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="age" className="text-gray-300">
+                  Age
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    <MdManageAccounts className="h-4 w-4" />
+                  </div>
+                  <Input
+                    id="age"
+                    name="age"
+                    type="number"
+                    placeholder="Eg. 28"
+                    value={formData.age}
                     onChange={handleChange}
                     required
                     className="bg-gray-800/50 border-gray-700 text-white pl-10 focus-visible:ring-yellow-500"
@@ -272,6 +316,26 @@ export default function SignupPage() {
                   </p>
                 )}
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="mmwid" className="text-gray-300">
+                  Metamask Wallet Address
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    <GiWallet className="h-4 w-4" />
+                  </div>
+                  <Input
+                    id="mmwid"
+                    name="metamaskWalletId"
+                    type="text"
+                    placeholder="0xYourMetaMaskWalletAddressHere"
+                    value={formData.metamaskWalletId}
+                    onChange={handleChange}
+                    required
+                    className="bg-gray-800/50 border-gray-700 text-white pl-10 focus-visible:ring-yellow-500"
+                  />
+                </div>
+              </div>
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black font-medium transition-all shadow-[0_0_15px_rgba(234,179,8,0.3)]"
@@ -378,3 +442,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+

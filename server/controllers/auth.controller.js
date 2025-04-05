@@ -9,14 +9,24 @@ import { verifyToken } from "../middlewares/verifyToken.js";
 // Register new user    
 export const register = async (req, res) => {
     try {
-        const { username, fullname, email, password, user_type } = req.body;
+        const { username, fullname, email, password, age, mmwid  } = req.body;
         const user = await User.findOne({ email })
         if (user) {
             return res.status(400).json({ msg: "User already exists. Please sign in with same credentials." });
         }
         const hashedPassword = await bcrypt.hash(password, 10)
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
-        const newUser = new User({ username, fullname, email, password: hashedPassword, user_type, verificationToken: verificationToken, verificationTokenExpiration: Date.now() + 24 * 60 * 60 * 1000, lastLoggedIn: Date.now() });
+        const newUser = new User({ 
+            username, 
+            fullname, 
+            email, 
+            password: hashedPassword,  
+            age,
+            walletID: mmwid,
+            verificationToken: verificationToken, 
+            verificationTokenExpiration: Date.now() + 24 * 60 * 60 * 1000, 
+            lastLoggedIn: Date.now() 
+        });
         await newUser.save();
 
         // Send Verification Email
@@ -44,17 +54,23 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email })
-        const isMatch = await bcrypt.compare(password, user.password)
         if (!user) {
             return res.status(400).json({ msg: "User Doesnot Exist. Please register." })
-        } else if (!isMatch) {
-            return res.status(400).json({ msg: "Invalid Password. Please Try Again." })
-        } else {
-            user.lastLoggedIn = Date.now();
-            generateTokenAndSetCookeies(res, user._id);
-            await user.save();
-            return res.status(200).json({ msg: "User loggedin Successfully" })
         }
+        const isMatch = await bcrypt.compare(password, user.password)
+        if (!isMatch) {
+            return res.status(400).json({ msg: "Invalid Password. Please Try Again." })
+        }
+        
+        // Update lastLoggedIn without triggering validation
+        await User.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { lastLoggedIn: Date.now() } },
+            { new: true }
+        );
+        
+        generateTokenAndSetCookeies(res, user._id);
+        return res.status(200).json({ msg: "User loggedin Successfully" })
 
     } catch (error) {
         console.log(error);
