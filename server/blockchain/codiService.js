@@ -141,33 +141,3 @@ export const buyCodi = async (to, amount) => {
     return null;
   }
 };
-
-export const backendTransferCODI = async (from, to, amount) => {
-  try {
-    const contract = await loadContract();
-    const decimals = await readContract({
-      contract,
-      method: "decimals",
-      params: [],
-    });
-
-    const amountInWei = parseUnits(amount.toString(), decimals);
-
-    const txRequest = prepareContractCall({
-      contract,
-      method: "transferFrom",
-      params: [from, to, amountInWei],
-    });
-
-    const txResult = await sendTransaction({
-      transaction: txRequest,
-      account, // backend wallet signs
-    });
-
-    console.log(`✅ Transferred ${amount} SIT from ${from} to ${to}`);
-    return txResult;
-  } catch (err) {
-    console.error("❌ TransferFrom failed:", err);
-    return { error: err.message };
-  }
-};
