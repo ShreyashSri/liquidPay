@@ -77,7 +77,8 @@ const loadContract = async () => {
 // ✅ Get balance using ABI method call
 export const getBalance = async (account) => {
   try {
-    const sanitized = account.trim();
+    // Ensure account is a string and trim it
+    const sanitized = String(account).trim();
     if (!isAddress(sanitized)) throw new Error(`Invalid address: ${sanitized}`);
 
     const contract = await loadContract();

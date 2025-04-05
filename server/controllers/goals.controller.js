@@ -211,7 +211,7 @@ export const dailyGoalPurgeAndReward = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ success: false, message: "❌ User not found" });
 
-        if (!user.walletAddress) {
+        if (!user.walletID) {
             return res.status(400).json({ success: false, message: "⚠️ No wallet address found. No SIT reward given." });
         }
 

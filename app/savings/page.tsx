@@ -201,6 +201,11 @@ export default function SavingsPage() {
         // Remove the goal from the local state
         setGoals(prevGoals => prevGoals.filter(g => g._id !== goalId));
         console.log("Goal completed!");
+        try {
+          const addRewardRes = await axios.post(`http://localhost:8188/api/goals/dailyreward/${userId}`);
+        } catch (rewardError: any) {
+          console.error("Error adding reward:", rewardError);
+        }
       } else {
         console.error(response.data.message || "Failed to complete goal");
       }
