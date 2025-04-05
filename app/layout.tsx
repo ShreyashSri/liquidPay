@@ -9,7 +9,7 @@ import Footer from "@/components/footer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "FinSavvy AI - Financial Behavior Modification",
+  title: "LiquidPay - Financial Behavior Modification",
   description:
     "AI-powered financial assistant that helps young adults curb impulse spending and build savings discipline",
     generator: 'v0.dev'
