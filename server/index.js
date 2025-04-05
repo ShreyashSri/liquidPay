@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes.js';
 import mongoose from 'mongoose';
 import { buyCodi, getBalance } from "./blockchain/codiService.js";
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -13,7 +14,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
-
+app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 
 try {
