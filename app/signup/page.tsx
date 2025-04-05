@@ -23,7 +23,7 @@ export default function SignupPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    metamaskWalletId: "",
+    walletID: "",
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -53,7 +53,7 @@ export default function SignupPage() {
         email: formData.email,
         password: formData.password,
         age: formData.age,
-        walletAddress: formData.metamaskWalletId || "0x0000000000000000000000000000000000000000",
+        mmwid: formData.walletID,
       });
     
       const data = res.data;
@@ -317,7 +317,7 @@ export default function SignupPage() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="mmwid" className="text-gray-300">
+                <Label htmlFor="walletID" className="text-gray-300">
                   Metamask Wallet Address
                 </Label>
                 <div className="relative">
@@ -325,11 +325,11 @@ export default function SignupPage() {
                     <GiWallet className="h-4 w-4" />
                   </div>
                   <Input
-                    id="mmwid"
-                    name="metamaskWalletId"
+                    id="walletID"
+                    name="walletID"
                     type="text"
                     placeholder="0xYourMetaMaskWalletAddressHere"
-                    value={formData.metamaskWalletId}
+                    value={formData.walletID}
                     onChange={handleChange}
                     required
                     className="bg-gray-800/50 border-gray-700 text-white pl-10 focus-visible:ring-yellow-500"
