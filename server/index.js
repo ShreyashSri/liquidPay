@@ -26,11 +26,7 @@ app.use('/api/transactions', txRoutes);
 app.use('/api/transactions', transactionsRoutes);
 
 try {
-    mongoose.connect(process.env.MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
-
+    mongoose.connect(process.env.MONGODB_URI)
     console.log('Connected to MongoDB')
 
 } catch (error) {

@@ -1,7 +1,11 @@
 import express from 'express'
-import { completeGoal, dailyGoalPurgeAndReward, genGoals } from '../controllers/goals.controller.js';
+import { completeGoal, dailyGoalPurgeAndReward, genGoals, getGoals } from '../controllers/goals.controller.js';
+import Goal from '../models/goals.model.js';
 
 const router = express.Router();
+
+// Get all goals for a user
+router.get("/:userId", getGoals);
 
 router.post("/generate/:userId", genGoals);
 
