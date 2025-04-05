@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes.js';
 import blockChainRoutes from './routes/blockchain.routes.js';
 import goalRoutes from './routes/goals.routes.js';
 import txRoutes from './routes/transaction.routes.js';
+import transactionsRoutes from './routes/transactions.routes.js';
 import mongoose from 'mongoose';
 import { buyCodi, getBalance } from "./blockchain/codiService.js";
 import cookieParser from 'cookie-parser';
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/web3', blockChainRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/transactions', txRoutes);
+app.use('/api/transactions', transactionsRoutes);
 
 try {
     mongoose.connect(process.env.MONGODB_URI, {

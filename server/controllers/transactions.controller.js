@@ -127,3 +127,32 @@ export const postTransaction = async (req, res) => {
     }
 };
 
+export const getUserTransactions = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    
+    // Find the user and get their transactions
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+
+    // Return the transactions
+    res.status(200).json({
+      success: true,
+      transactions: user.transactions || []
+    });
+
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching transactions'
+    });
+  }
+};
+

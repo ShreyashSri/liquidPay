@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,71 +27,11 @@ import {
   Smartphone,
   Mail,
   MessageSquare,
+  Loader2,
+  Scale,
 } from "lucide-react";
-
-// Mock nudges data
-const nudges = [
-  {
-    id: 1,
-    title: "High Restaurant Spending",
-    message:
-      "You've spent ₹4,500 on restaurants this month, which is 30% higher than your usual. Want to set a limit?",
-    time: "2 hours ago",
-    type: "warning",
-    category: "Spending",
-    icon: <Utensils className="h-5 w-5" />,
-  },
-  {
-    id: 2,
-    title: "Subscription Renewal",
-    message:
-      "Your Netflix subscription (₹499) will renew tomorrow. You haven't watched in 45 days. Cancel?",
-    time: "1 day ago",
-    type: "info",
-    category: "Subscriptions",
-    icon: <CreditCard className="h-5 w-5" />,
-  },
-  {
-    id: 3,
-    title: "Savings Milestone",
-    message:
-      "Congrats! You've saved ₹10,000 this month. That's a new record! Keep it up!",
-    time: "3 days ago",
-    type: "success",
-    category: "Savings",
-    icon: <TrendingUp className="h-5 w-5" />,
-  },
-  {
-    id: 4,
-    title: "Late Night Shopping",
-    message:
-      "We noticed you tend to shop online between 11PM-2AM. These purchases are 60% more likely to be returned.",
-    time: "5 days ago",
-    type: "warning",
-    category: "Behavior",
-    icon: <ShoppingBag className="h-5 w-5" />,
-  },
-  {
-    id: 5,
-    title: "Coffee Budget Alert",
-    message:
-      "You're at 90% of your monthly coffee budget (₹2,250/₹2,500). Consider brewing at home for the rest of the month.",
-    time: "1 week ago",
-    type: "warning",
-    category: "Budget",
-    icon: <Coffee className="h-5 w-5" />,
-  },
-  {
-    id: 6,
-    title: "Entertainment Spending Down",
-    message:
-      "Your entertainment spending is down 15% this month. Great job sticking to your budget!",
-    time: "1 week ago",
-    type: "success",
-    category: "Behavior",
-    icon: <Film className="h-5 w-5" />,
-  },
-];
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 // Nudge settings
 const nudgeSettings = [
@@ -156,12 +96,224 @@ const deliveryPreferences = [
   },
 ];
 
-export default function NudgesPage() {
-  const [activeTab, setActiveTab] = useState("all");
-  const [settings, setSettings] = useState(nudgeSettings);
-  const [delivery, setDelivery] = useState(deliveryPreferences);
+interface NudgeSetting {
+  id: number;
+  name: string;
+  description: string;
+  enabled: boolean;
+}
 
-  const toggleSetting = (id) => {
+interface DeliveryPreference {
+  id: number;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  enabled: boolean;
+}
+
+interface Goal {
+  title: string;
+  description: string;
+  type?: string;
+  category?: string;
+}
+
+interface Nudge {
+  id: number;
+  title: string;
+  message: string;
+  time: string;
+  type: string;
+  category: string;
+  icon: React.ReactNode;
+}
+
+const NudgeCard = ({ nudge }: { nudge: Nudge }) => (
+  <Card className="bg-gray-800/70 backdrop-blur-sm border border-gray-700 hover:border-gray-600 transition-all">
+    <CardContent className="p-6">
+      <div className="flex space-x-4">
+        <div className="flex-shrink-0 mt-0.5">
+          <div
+            className={`p-2 rounded-full ${
+              nudge.type === "warning"
+                ? "bg-yellow-500/20"
+                : nudge.type === "success"
+                ? "bg-green-500/20"
+                : "bg-blue-500/20"
+            }`}
+          >
+            {nudge.icon}
+          </div>
+        </div>
+        <div className="flex-1">
+          <div className="flex justify-between items-start mb-2">
+            <h4 className="text-lg font-medium text-white">
+              {nudge.title}
+            </h4>
+            <Badge
+              className={`${
+                nudge.type === "warning"
+                  ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                  : nudge.type === "success"
+                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                  : "bg-blue-500/20 text-blue-400 border-blue-500/30"
+              }`}
+            >
+              {nudge.category}
+            </Badge>
+          </div>
+          <p className="text-gray-300 mb-4">{nudge.message}</p>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-500">
+              {nudge.time}
+            </span>
+          </div>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+export default function NudgesPage() {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("all");
+  const [settings, setSettings] = useState<NudgeSetting[]>(nudgeSettings);
+  const [delivery, setDelivery] = useState<DeliveryPreference[]>(deliveryPreferences);
+  const [nudges, setNudges] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPersonalizedGoals = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get("http://localhost:8188/api/auth/checkAuth", {
+          withCredentials: true,
+        });
+
+        if (response.data.success && response.data.user) {
+          try {
+            // First get the user's transactions
+            const transactionsResponse = await axios.get(
+              `http://localhost:8188/api/transactions/${response.data.user._id}`,
+              { withCredentials: true }
+            );
+
+            if (transactionsResponse.data && transactionsResponse.data.transactions) {
+              // Calculate spending patterns
+              const transactions = transactionsResponse.data.transactions;
+              const needsSpending = transactions.reduce((total: number, day: any) => {
+                return total + day.needs.reduce((sum: number, item: any) => sum + item.amount, 0);
+              }, 0);
+              
+              const wantsSpending = transactions.reduce((total: number, day: any) => {
+                return total + day.wants.reduce((sum: number, item: any) => sum + item.amount, 0);
+              }, 0);
+
+              const totalSpending = needsSpending + wantsSpending;
+              const savingsRate = ((totalSpending / 7) * 30).toFixed(2); // Projected monthly spending
+
+              // Generate personalized goals based on spending patterns
+              const personalizedNudges = [
+                {
+                  id: 1,
+                  title: "Monthly Spending Analysis",
+                  message: `Based on your recent spending, you're projected to spend ₹${savingsRate} this month. Consider reviewing your expenses.`,
+                  time: "Just now",
+                  type: "info",
+                  category: "Analysis",
+                  icon: <TrendingUp className="h-5 w-5" />,
+                },
+                {
+                  id: 2,
+                  title: "Needs vs Wants Balance",
+                  message: `Your needs spending (₹${needsSpending.toFixed(2)}) vs wants spending (₹${wantsSpending.toFixed(2)}) ratio is ${(needsSpending/wantsSpending).toFixed(2)}. Consider adjusting if needed.`,
+                  time: "Just now",
+                  type: "info",
+                  category: "Balance",
+                  icon: <Scale className="h-5 w-5" />,
+                },
+                {
+                  id: 3,
+                  title: "Daily Spending Average",
+                  message: `Your average daily spending is ₹${(totalSpending/7).toFixed(2)}. Try to stay within this budget.`,
+                  time: "Just now",
+                  type: "success",
+                  category: "Budget",
+                  icon: <CreditCard className="h-5 w-5" />,
+                }
+              ];
+
+              setNudges(personalizedNudges);
+            } else {
+              // Fallback to mock data if no transactions are found
+              const mockNudges = [
+                {
+                  id: 1,
+                  title: "Track Your Spending",
+                  message: "Start tracking your daily expenses to better understand your spending patterns",
+                  time: "Just now",
+                  type: "info",
+                  category: "Spending",
+                  icon: <ShoppingBag className="h-5 w-5" />,
+                },
+                {
+                  id: 2,
+                  title: "Set a Budget",
+                  message: "Create a monthly budget to help manage your finances better",
+                  time: "Just now",
+                  type: "info",
+                  category: "Budget",
+                  icon: <CreditCard className="h-5 w-5" />,
+                },
+                {
+                  id: 3,
+                  title: "Start Saving",
+                  message: "Consider setting aside 20% of your income for savings",
+                  time: "Just now",
+                  type: "success",
+                  category: "Savings",
+                  icon: <TrendingUp className="h-5 w-5" />,
+                }
+              ];
+              setNudges(mockNudges);
+            }
+          } catch (goalsError: any) {
+            console.error("Error generating goals:", goalsError);
+            setError("Failed to generate personalized goals. Please try again later.");
+          }
+        } else {
+          setError("Please log in to view your personalized goals");
+        }
+      } catch (error: any) {
+        console.error("Error checking authentication:", error);
+        setError("Failed to authenticate. Please log in again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPersonalizedGoals();
+  }, []);
+
+  const getIconForCategory = (category:any) => {
+    switch (category?.toLowerCase()) {
+      case "spending":
+        return <ShoppingBag className="h-5 w-5" />;
+      case "savings":
+        return <TrendingUp className="h-5 w-5" />;
+      case "subscription":
+        return <CreditCard className="h-5 w-5" />;
+      case "food":
+        return <Utensils className="h-5 w-5" />;
+      case "entertainment":
+        return <Film className="h-5 w-5" />;
+      default:
+        return <Bell className="h-5 w-5" />;
+    }
+  };
+
+  const toggleSetting = (id: number) => {
     setSettings(
       settings.map((setting) =>
         setting.id === id ? { ...setting, enabled: !setting.enabled } : setting
@@ -169,7 +321,7 @@ export default function NudgesPage() {
     );
   };
 
-  const toggleDelivery = (id) => {
+  const toggleDelivery = (id: number) => {
     setDelivery(
       delivery.map((pref) =>
         pref.id === id ? { ...pref, enabled: !pref.enabled } : pref
@@ -181,6 +333,27 @@ export default function NudgesPage() {
     activeTab === "all"
       ? nudges
       : nudges.filter((nudge) => nudge.type === activeTab);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white">Error</CardTitle>
+            <CardDescription className="text-gray-400">{error}</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black pt-24 pb-16">
@@ -220,229 +393,25 @@ export default function NudgesPage() {
 
               <TabsContent value="all" className="mt-0 space-y-4">
                 {filteredNudges.map((nudge) => (
-                  <Card
-                    key={nudge.id}
-                    className="bg-gray-800/70 backdrop-blur-sm border border-gray-700 hover:border-gray-600 transition-all"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex space-x-4">
-                        <div className="flex-shrink-0 mt-0.5">
-                          <div
-                            className={`p-2 rounded-full ${
-                              nudge.type === "warning"
-                                ? "bg-yellow-500/20"
-                                : nudge.type === "success"
-                                ? "bg-green-500/20"
-                                : "bg-blue-500/20"
-                            }`}
-                          >
-                            {nudge.icon}
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="text-lg font-medium text-white">
-                              {nudge.title}
-                            </h4>
-                            <Badge
-                              className={`${
-                                nudge.type === "warning"
-                                  ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                                  : nudge.type === "success"
-                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                  : "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                              }`}
-                            >
-                              {nudge.category}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-300 mb-4">{nudge.message}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-500">
-                              {nudge.time}
-                            </span>
-                            <div className="flex space-x-2">
-                              {nudge.type === "warning" ||
-                              nudge.type === "info" ? (
-                                <>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 px-3 text-sm border-gray-600 hover:bg-gray-700"
-                                  >
-                                    <X className="h-4 w-4 mr-1" /> Dismiss
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    className={`h-8 px-3 text-sm ${
-                                      nudge.type === "warning"
-                                        ? "bg-yellow-600 hover:bg-yellow-500"
-                                        : "bg-blue-600 hover:bg-blue-500"
-                                    } text-white`}
-                                  >
-                                    <CheckCircle className="h-4 w-4 mr-1" />{" "}
-                                    Take Action
-                                  </Button>
-                                </>
-                              ) : (
-                                <Button
-                                  size="sm"
-                                  className="h-8 px-3 text-sm bg-green-600 hover:bg-green-500 text-white"
-                                >
-                                  <CheckCircle className="h-4 w-4 mr-1" />{" "}
-                                  Acknowledge
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <NudgeCard key={nudge.id} nudge={nudge} />
                 ))}
               </TabsContent>
 
               <TabsContent value="warning" className="mt-0 space-y-4">
                 {filteredNudges.map((nudge) => (
-                  <Card
-                    key={nudge.id}
-                    className="bg-gray-800/70 backdrop-blur-sm border border-gray-700 hover:border-gray-600 transition-all"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex space-x-4">
-                        <div className="flex-shrink-0 mt-0.5">
-                          <div className="p-2 rounded-full bg-yellow-500/20">
-                            {nudge.icon}
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="text-lg font-medium text-white">
-                              {nudge.title}
-                            </h4>
-                            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                              {nudge.category}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-300 mb-4">{nudge.message}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-500">
-                              {nudge.time}
-                            </span>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-3 text-sm border-gray-600 hover:bg-gray-700"
-                              >
-                                <X className="h-4 w-4 mr-1" /> Dismiss
-                              </Button>
-                              <Button
-                                size="sm"
-                                className="h-8 px-3 text-sm bg-yellow-600 hover:bg-yellow-500 text-white"
-                              >
-                                <CheckCircle className="h-4 w-4 mr-1" /> Take
-                                Action
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <NudgeCard key={nudge.id} nudge={nudge} />
                 ))}
               </TabsContent>
 
               <TabsContent value="info" className="mt-0 space-y-4">
                 {filteredNudges.map((nudge) => (
-                  <Card
-                    key={nudge.id}
-                    className="bg-gray-800/70 backdrop-blur-sm border border-gray-700 hover:border-gray-600 transition-all"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex space-x-4">
-                        <div className="flex-shrink-0 mt-0.5">
-                          <div className="p-2 rounded-full bg-blue-500/20">
-                            {nudge.icon}
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="text-lg font-medium text-white">
-                              {nudge.title}
-                            </h4>
-                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                              {nudge.category}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-300 mb-4">{nudge.message}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-500">
-                              {nudge.time}
-                            </span>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-3 text-sm border-gray-600 hover:bg-gray-700"
-                              >
-                                <X className="h-4 w-4 mr-1" /> Dismiss
-                              </Button>
-                              <Button
-                                size="sm"
-                                className="h-8 px-3 text-sm bg-blue-600 hover:bg-blue-500 text-white"
-                              >
-                                <CheckCircle className="h-4 w-4 mr-1" /> Take
-                                Action
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <NudgeCard key={nudge.id} nudge={nudge} />
                 ))}
               </TabsContent>
 
               <TabsContent value="success" className="mt-0 space-y-4">
                 {filteredNudges.map((nudge) => (
-                  <Card
-                    key={nudge.id}
-                    className="bg-gray-800/70 backdrop-blur-sm border border-gray-700 hover:border-gray-600 transition-all"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex space-x-4">
-                        <div className="flex-shrink-0 mt-0.5">
-                          <div className="p-2 rounded-full bg-green-500/20">
-                            {nudge.icon}
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="text-lg font-medium text-white">
-                              {nudge.title}
-                            </h4>
-                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                              {nudge.category}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-300 mb-4">{nudge.message}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-500">
-                              {nudge.time}
-                            </span>
-                            <Button
-                              size="sm"
-                              className="h-8 px-3 text-sm bg-green-600 hover:bg-green-500 text-white"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-1" />{" "}
-                              Acknowledge
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <NudgeCard key={nudge.id} nudge={nudge} />
                 ))}
               </TabsContent>
             </Tabs>
