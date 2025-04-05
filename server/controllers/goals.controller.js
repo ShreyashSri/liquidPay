@@ -30,6 +30,18 @@ async function fetchGeminiGoals(promptText) {
         // Clean up markdown formatting if present
         resultText = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         
+        // Extract JSON array from the response
+        const jsonMatch = resultText.match(/\[\s*\{.*\}\s*\]/s);
+        if (jsonMatch) {
+            return jsonMatch[0];
+        }
+        
+        // If no JSON array found, try to find the last JSON-like structure
+        const lastJsonMatch = resultText.match(/\{.*\}/g);
+        if (lastJsonMatch) {
+            return lastJsonMatch[lastJsonMatch.length - 1];
+        }
+        
         return resultText;
     } catch (error) {
         console.error("Gemini fetch error:", error.response?.data || error.message);
