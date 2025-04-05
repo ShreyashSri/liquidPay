@@ -1,69 +1,100 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Mail, AlertCircle, Check } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function VerifyEmailPage() {
-  const [email, setEmail] = useState("");
+  const router = useRouter();
   const [otp, setOtp] = useState("");
-  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleVerify = async () => {
+    if (!otp) {
+      setMessage("Please enter the OTP");
+      return;
+    }
+
     try {
       setIsLoading(true);
-      const res = await axios.post(
-        "http://localhost:3000/api/auth/verify-otp",
-        {
-          email,
-          otp,
-        }
+      const response = await axios.post(
+        "http://localhost:8188/api/auth/verifyEmail",
+        { verificationToken: otp },
+        { withCredentials: true }
       );
-      setIsSuccess(true);
-      setMessage(res.data.msg || "Email verified successfully!");
-    } catch (err: any) {
+
+      if (response.data.msg === "Email verified and welcome email sent") {
+        setIsSuccess(true);
+        setMessage("Email verified successfully!");
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        setIsSuccess(false);
+        setMessage(response.data.msg || "Verification failed");
+      }
+    } catch (error: any) {
       setIsSuccess(false);
-      setMessage(err.response?.data?.msg || "Invalid OTP or email");
+      setMessage(error.response?.data?.msg || "An error occurred during verification");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black py-20">
-      <div className="container px-4 mx-auto">
-        <Card className="max-w-md mx-auto bg-gray-900/80 backdrop-blur-md border-gray-800 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-black py-20 relative overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,215,0,0.1),transparent_40%)]"></div>
+        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_70%,rgba(192,192,192,0.1),transparent_40%)]"></div>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-[100px]"></div>
+      </div>
+
+      <div className="container px-4 mx-auto relative z-10">
+        <Card className="max-w-md mx-auto bg-gray-900/80 backdrop-blur-md border-gray-800 shadow-xl animate-in fade-in-50 duration-500">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-600 to-yellow-400"></div>
           <CardHeader className="space-y-1 text-center">
             <div className="flex justify-center mb-2">
               <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                <Mail className="h-6 w-6 text-yellow-500" />
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-6 w-6 text-yellow-500"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2v1" />
+                  <path d="M12 21v1" />
+                  <path d="M4.93 4.93l.7.7" />
+                  <path d="M18.36 18.36l.7.7" />
+                  <path d="M2 12h1" />
+                  <path d="M21 12h1" />
+                  <path d="M4.93 19.07l.7-.7" />
+                  <path d="M18.36 5.64l.7-.7" />
+                  <circle cx="12" cy="12" r="4" />
+                </svg>
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-white">
               Verify Your Email
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Enter your email and OTP code to verify your account
+              Enter the OTP sent to your email
             </CardDescription>
           </CardHeader>
           <CardContent>
             {message && (
               <Alert
+                variant={isSuccess ? "default" : "destructive"}
                 className={`mb-4 ${
                   isSuccess
                     ? "bg-green-900/30 border-green-800 text-green-300"
@@ -71,7 +102,7 @@ export default function VerifyEmailPage() {
                 }`}
               >
                 {isSuccess ? (
-                  <Check className="h-4 w-4" />
+                  <CheckCircle2 className="h-4 w-4" />
                 ) : (
                   <AlertCircle className="h-4 w-4" />
                 )}
@@ -81,39 +112,18 @@ export default function VerifyEmailPage() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300">
-                  Email
-                </Label>
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    <Mail className="h-4 w-4" />
-                  </div>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-800/50 border-gray-700 text-white pl-10 focus-visible:ring-yellow-500"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="otp" className="text-gray-300">
-                  OTP Code
-                </Label>
                 <Input
-                  id="otp"
-                  placeholder="Enter 6-digit code"
+                  type="text"
+                  placeholder="Enter OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="bg-gray-800/50 border-gray-700 text-white focus-visible:ring-yellow-500"
+                  className="bg-gray-800/50 border-gray-700 text-white"
                 />
               </div>
               <Button
                 onClick={handleVerify}
+                className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black font-medium transition-all shadow-[0_0_15px_rgba(234,179,8,0.3)]"
               >
                 {isLoading ? (
                   <div className="flex items-center">
@@ -145,14 +155,6 @@ export default function VerifyEmailPage() {
               </Button>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center border-t border-gray-800 pt-6">
-            <p className="text-gray-400 text-sm">
-              Didn't receive code?{" "}
-              <button className="text-yellow-500 hover:text-yellow-400 font-medium transition-colors">
-                Resend OTP
-              </button>
-            </p>
-          </CardFooter>
         </Card>
       </div>
     </div>
