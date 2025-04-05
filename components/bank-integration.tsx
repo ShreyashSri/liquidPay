@@ -11,37 +11,37 @@ const banks = [
   {
     id: 1,
     name: "HDFC Bank",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/HDFC_logo.png",
     connected: false,
   },
   {
     id: 2,
     name: "ICICI Bank",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/ICIC_logo.png",
     connected: false,
   },
   {
     id: 3,
     name: "SBI",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/SBI_logo.png",
     connected: false,
   },
   {
     id: 4,
     name: "Axis Bank",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/AXIS_logo.png",
     connected: false,
   },
   {
     id: 5,
     name: "Kotak Mahindra",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/KOTAK_logo.png",
     connected: false,
   },
   {
     id: 6,
     name: "Yes Bank",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/YESBANK_logo.png",
     connected: false,
   },
 ];

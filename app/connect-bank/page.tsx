@@ -29,16 +29,16 @@ import {
 } from "lucide-react";
 
 const popularBanks = [
-  { id: 1, name: "HDFC Bank", logo: "/placeholder.svg?height=40&width=40" },
-  { id: 2, name: "ICICI Bank", logo: "/placeholder.svg?height=40&width=40" },
-  { id: 3, name: "SBI", logo: "/placeholder.svg?height=40&width=40" },
-  { id: 4, name: "Axis Bank", logo: "/placeholder.svg?height=40&width=40" },
+  { id: 1, name: "HDFC Bank", logo: "/banks/HDFC_logo.png" },
+  { id: 2, name: "ICICI Bank", logo: "/banks/ICIC_logo.png" },
+  { id: 3, name: "SBI", logo: "/banks/SBI_logo.png" },
+  { id: 4, name: "Axis Bank", logo: "/banks/AXIS_logo.png" },
   {
     id: 5,
     name: "Kotak Mahindra",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/KOTAK_logo.png",
   },
-  { id: 6, name: "Yes Bank", logo: "/placeholder.svg?height=40&width=40" },
+  { id: 6, name: "Yes Bank", logo: "/banks/YESBANK_logo.png" },
 ];
 
 const allBanks = [
@@ -46,21 +46,21 @@ const allBanks = [
   {
     id: 7,
     name: "Punjab National Bank",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/PUNJATBANK_logo.png",
   },
   {
     id: 8,
     name: "Bank of Baroda",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/BANKBARODA_logo.png",
   },
-  { id: 9, name: "Canara Bank", logo: "/placeholder.svg?height=40&width=40" },
-  { id: 10, name: "Union Bank", logo: "/placeholder.svg?height=40&width=40" },
+  { id: 9, name: "Canara Bank", logo: "/banks/CANARA_logo.png" },
+  { id: 10, name: "Union Bank", logo: "/banks/UNIONBANK_logo.png" },
   {
     id: 11,
     name: "IndusInd Bank",
-    logo: "/placeholder.svg?height=40&width=40",
+    logo: "/banks/INDUSIN_logo.png",
   },
-  { id: 12, name: "IDBI Bank", logo: "/placeholder.svg?height=40&width=40" },
+  { id: 12, name: "IDBI Bank", logo: "/banks/IDBI_logo.png" },
 ];
 
 export default function ConnectBankPage() {
