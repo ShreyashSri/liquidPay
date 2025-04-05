@@ -3,14 +3,21 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Menu, X, ChevronDown, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import axios from "axios";
+
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+}
 
 const navLinks = [
   { name: "AI Features", href: "/features" },
@@ -30,7 +37,10 @@ const navLinks = [
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,9 +51,38 @@ export default function Navbar() {
       }
     };
 
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get('http://localhost:8188/api/auth/checkauth', {
+          withCredentials: true
+        });
+        if (response.data.success) {
+          setIsLoggedIn(true);
+          setUser(response.data.user);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+        setUser(null);
+      }
+    };
+
+    checkAuth();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8188/api/auth/logout', {}, {
+        withCredentials: true
+      });
+      setIsLoggedIn(false);
+      setUser(null);
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <header
@@ -127,19 +166,47 @@ export default function Navbar() {
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/login">
-              <Button
-                variant="ghost"
-                className="text-white hover:text-white hover:bg-gray-800"
-              >
-                Login
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black">
-                Sign Up
-              </Button>
-            </Link>
+            {!isLoggedIn ? (
+              <>
+                <Link href="/login">
+                  <Button
+                    variant="ghost"
+                    className="text-white hover:text-white hover:bg-gray-800"
+                  >
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="text-white hover:text-white hover:bg-gray-800">
+                    {user?.username || 'Account'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48 bg-gray-900 border-gray-800">
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="text-gray-300 hover:text-white hover:bg-gray-800">
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="text-gray-300 hover:text-white hover:bg-gray-800">
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:text-red-300 hover:bg-gray-800">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <Link href="/connect-bank">
               <Button
                 variant="outline"
@@ -201,20 +268,55 @@ export default function Navbar() {
                   </Link>
                 )
               )}
+
               <div className="pt-4 border-t border-gray-800 flex flex-col space-y-3">
-                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-white hover:text-white hover:bg-gray-800"
-                  >
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black">
-                    Sign Up
-                  </Button>
-                </Link>
+                {!isLoggedIn ? (
+                  <>
+                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-white hover:text-white hover:bg-gray-800"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-white hover:text-white hover:bg-gray-800"
+                      >
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-white hover:text-white hover:bg-gray-800"
+                      >
+                        Profile
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-gray-800"
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </Button>
+                  </>
+                )}
                 <Link href="/connect-bank" onClick={() => setIsMenuOpen(false)}>
                   <Button
                     variant="outline"
