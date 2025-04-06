@@ -28,9 +28,11 @@ import {
   DollarSign,
   AlertCircle,
   Brain,
+  Loader2,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 // Define TypeScript interfaces
 interface SpendingData {
@@ -65,6 +67,13 @@ interface Recommendation {
 interface BehaviorsData {
   impulse: Behavior[];
   positive: Behavior[];
+}
+
+// Add PredictionResult interface
+interface PredictionResult {
+  lastWeekTotal: number;
+  predictedWeekTotal: number;
+  dailyPredictions: number[];
 }
 
 // Mock data for spending patterns
@@ -129,7 +138,7 @@ const behaviors: BehaviorsData = {
       icon: <CreditCard className="h-5 w-5 text-yellow-500" />,
       progress: 65,
       details:
-        "You're spending ₹3,200/month across multiple platforms, but usage logs suggest you're only engaging with 4 consistently. Trimming unused subscriptions isn’t sacrifice—it’s smart prioritization.",
+        "You're spending ₹3,200/month across multiple platforms, but usage logs suggest you're only engaging with 4 consistently. Trimming unused subscriptions isn't sacrifice—it's smart prioritization.",
     },
     {
       id: 2,
@@ -255,6 +264,8 @@ export default function BehaviorAnalysisPage() {
   const [locationData, setLocationData] = useState<SpendingData[]>(locationSpending);
   const [behaviorsData, setBehaviors] = useState<BehaviorsData>(behaviors);
   const [recommendationsData, setRecommendations] = useState<Recommendation[]>(recommendations);
+  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const router = useRouter();
   const { data: session } = useSession();
@@ -304,6 +315,37 @@ export default function BehaviorAnalysisPage() {
     }
   };
 
+  const handleCustomAnalysis = async () => {
+    setIsAnalyzing(true);
+    setError(null);
+    setPredictionResult(null);
+    
+    try {
+      // Simulate API call to ML backend
+      // In a real implementation, this would call your ML backend
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Mock prediction data
+      const mockPredictionData: PredictionResult = {
+        lastWeekTotal: 20073.00,
+        predictedWeekTotal: 9058.70,
+        dailyPredictions: [
+          1200.50, 1350.75, 980.25, 1450.30, 1100.45, 1250.60, 1725.85
+        ]
+      };
+      
+      setPredictionResult(mockPredictionData);
+      toast.success('Analysis complete! View your prediction results below.');
+      
+    } catch (error) {
+      console.error('Custom analysis failed:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      toast.error(error instanceof Error ? error.message : 'Please try again later');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   useEffect(() => {
     if (session) {
       fetchData();
@@ -322,10 +364,82 @@ export default function BehaviorAnalysisPage() {
               AI-powered insights into your financial habits and patterns
             </p>
           </div>
-          <Button className="mt-4 md:mt-0 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black">
-            <Brain className="h-4 w-4 mr-2" /> Get Custom Analysis
+          <Button 
+            className="mt-4 md:mt-0 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black"
+            onClick={handleCustomAnalysis}
+            disabled={isAnalyzing}
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <Brain className="h-4 w-4 mr-2" /> Get Custom Analysis
+              </>
+            )}
           </Button>
         </div>
+
+        {/* Display Prediction Results */}
+        {predictionResult && (
+          <div className="mb-8">
+            <Card className="bg-gray-800 border-gray-700 shadow-lg overflow-hidden">
+              <div className="h-1.5 w-full bg-gradient-to-r from-yellow-600 to-yellow-400"></div>
+              <CardHeader>
+                <div className="flex items-center">
+                  <Brain className="h-5 w-5 text-yellow-500 mr-2" />
+                  <CardTitle className="text-white">
+                    Custom Analysis Results
+                  </CardTitle>
+                </div>
+                <CardDescription className="text-gray-400">
+                  AI-powered prediction of your spending patterns
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="bg-gray-700/50 rounded-lg p-4">
+                    <h3 className="text-lg font-medium text-white mb-2">Last Week's Spending</h3>
+                    <p className="text-2xl font-bold text-yellow-500">₹{predictionResult.lastWeekTotal.toFixed(2)}</p>
+                  </div>
+                  <div className="bg-gray-700/50 rounded-lg p-4">
+                    <h3 className="text-lg font-medium text-white mb-2">Predicted Week's Spending</h3>
+                    <p className="text-2xl font-bold text-yellow-500">₹{predictionResult.predictedWeekTotal.toFixed(2)}</p>
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <h3 className="text-lg font-medium text-white mb-2">Daily Predictions</h3>
+                  <div className="flex overflow-x-auto pb-2 gap-3">
+                    {predictionResult.dailyPredictions.map((amount, index) => (
+                      <div key={index} className="bg-gray-700/50 rounded-lg p-3 min-w-[120px]">
+                        <p className="text-sm text-gray-400">Day {index + 1}</p>
+                        <p className="text-lg font-medium text-white">₹{amount.toFixed(2)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <AlertCircle className="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <h3 className="text-lg font-medium text-white mb-2">Analysis Insights</h3>
+                      <p className="text-gray-300">
+                        Your spending is predicted to {predictionResult.predictedWeekTotal < predictionResult.lastWeekTotal ? 'decrease' : 'increase'} by{' '}
+                        {Math.abs(((predictionResult.predictedWeekTotal - predictionResult.lastWeekTotal) / predictionResult.lastWeekTotal) * 100).toFixed(1)}% 
+                        compared to last week. This {predictionResult.predictedWeekTotal < predictionResult.lastWeekTotal ? 'positive' : 'negative'} trend 
+                        suggests {predictionResult.predictedWeekTotal < predictionResult.lastWeekTotal ? 'improved' : 'increased'} spending habits.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {loading && (
           <div className="flex justify-center items-center h-64">

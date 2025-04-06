@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { toast } from "react-hot-toast";
 import {
   TrendingUp,
   TrendingDown,
@@ -15,9 +16,40 @@ import {
   Film,
   CreditCard,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
+import { fetchPrediction, type PredictionRequest, type PredictionResponse } from "@/utils/api";
 
-const behaviors = {
+type Impact = 'high' | 'medium';
+type Trend = 'up' | 'down';
+
+interface Behavior {
+  id: number;
+  title: string;
+  description: string;
+  impact: Impact;
+  savings?: string;
+  trend?: Trend;
+  icon: JSX.Element;
+  progress: number;
+}
+
+interface Behaviors {
+  impulse: Behavior[];
+  positive: Behavior[];
+}
+
+interface PredictionResult {
+  behaviorId: number;
+  predictedChange: number;
+  confidence: number;
+  recommendedActions: string[];
+  lastWeekTotal?: number;
+  predictedWeekTotal?: number;
+  dailyPredictions?: number[];
+}
+
+const behaviors: Behaviors = {
   impulse: [
     {
       id: 1,
@@ -83,8 +115,173 @@ const behaviors = {
   ],
 };
 
+const PredictionDisplay = ({ prediction, behaviorId }: { prediction: PredictionResult; behaviorId: number }) => {
+  if (!prediction) return null;
+  
+  return (
+    <div className="mt-4 p-4 bg-gray-800/50 rounded-lg">
+      <h4 className="text-sm font-medium text-gray-300 mb-2">Prediction Results</h4>
+      <div className="text-xs text-gray-400">
+        <div className="mb-2">
+          <span className="font-medium">Predicted Change:</span> {prediction.predictedChange.toFixed(1)}%
+        </div>
+        <div className="mb-2">
+          <span className="font-medium">Confidence:</span> {(prediction.confidence * 100).toFixed(1)}%
+        </div>
+        {prediction.lastWeekTotal && prediction.predictedWeekTotal && (
+          <div className="mb-2">
+            <span className="font-medium">Last Week Total:</span> ₹{prediction.lastWeekTotal.toFixed(2)}
+          </div>
+        )}
+        {prediction.lastWeekTotal && prediction.predictedWeekTotal && (
+          <div className="mb-2">
+            <span className="font-medium">Predicted Week Total:</span> ₹{prediction.predictedWeekTotal.toFixed(2)}
+          </div>
+        )}
+        {prediction.dailyPredictions && (
+          <div className="mb-2">
+            <span className="font-medium">Daily Predictions:</span>
+            <div className="flex gap-2 mt-1 overflow-x-auto">
+              {prediction.dailyPredictions.map((amount, index) => (
+                <div key={index} className="bg-gray-700/50 px-2 py-1 rounded">
+                  Day {index + 1}: ₹{amount.toFixed(2)}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {prediction.recommendedActions && (
+          <div>
+            <span className="font-medium">Recommendations:</span>
+            <ul className="list-disc list-inside mt-1">
+              {prediction.recommendedActions.map((action, index) => (
+                <li key={index}>{action}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default function BehaviorInsights() {
   const [activeTab, setActiveTab] = useState("impulse");
+  const [predictingBehaviorId, setPredictingBehaviorId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [isCustomAnalysisLoading, setIsCustomAnalysisLoading] = useState(false);
+
+  const handlePredictBehavior = async (behaviorId: number) => {
+    setError(null);
+    setPrediction(null);
+    setPredictingBehaviorId(behaviorId);
+    
+    try {
+      // Prepare prediction request data
+      const predictionRequest: PredictionRequest = {
+        User_id: 1, // You might want to get this from user context
+        category: behaviors[activeTab].find(b => b.id === behaviorId)?.title || "Other",
+        Amount: 1000, // You might want to get this from user data
+        Age: 25, // You might want to get this from user profile
+        Day_of_week: new Date().getDay(),
+        Month: new Date().getMonth() + 1,
+        Day_of_month: new Date().getDate(),
+        year: new Date().getFullYear()
+      };
+
+      const predictionData = await fetchPrediction(predictionRequest);
+      
+      // Calculate predicted change percentage
+      const predictedChange = ((predictionData.predicted_week_total - predictionData.last_week_total) / predictionData.last_week_total) * 100;
+      
+      // Generate recommendations based on the prediction
+      const recommendedActions = generateRecommendations(predictedChange, predictionRequest.category);
+      
+      setPrediction({
+        behaviorId,
+        predictedChange,
+        confidence: 0.85, // You might want to calculate this based on model confidence
+        recommendedActions,
+        lastWeekTotal: predictionData.last_week_total,
+        predictedWeekTotal: predictionData.predicted_week_total,
+        dailyPredictions: predictionData.daily_predictions
+      });
+      
+      toast.success('Prediction complete! View your behavior prediction below.');
+
+    } catch (error) {
+      console.error('Prediction failed:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      toast.error(error instanceof Error ? error.message : 'Please try again later');
+    } finally {
+      setPredictingBehaviorId(null);
+    }
+  };
+
+  const handleCustomAnalysis = async () => {
+    setError(null);
+    setPrediction(null);
+    setIsCustomAnalysisLoading(true);
+    
+    try {
+      // Prepare prediction request data for custom analysis
+      const predictionRequest: PredictionRequest = {
+        User_id: 1, // You might want to get this from user context
+        category: "Custom Analysis",
+        Amount: 1000, // You might want to get this from user data
+        Age: 25, // You might want to get this from user profile
+        Day_of_week: new Date().getDay(),
+        Month: new Date().getMonth() + 1,
+        Day_of_month: new Date().getDate(),
+        year: new Date().getFullYear()
+      };
+
+      const predictionData = await fetchPrediction(predictionRequest);
+      
+      // Calculate predicted change percentage
+      const predictedChange = ((predictionData.predicted_week_total - predictionData.last_week_total) / predictionData.last_week_total) * 100;
+      
+      // Generate recommendations based on the prediction
+      const recommendedActions = generateRecommendations(predictedChange, "overall spending");
+      
+      setPrediction({
+        behaviorId: 0, // Use 0 for custom analysis
+        predictedChange,
+        confidence: 0.85, // You might want to calculate this based on model confidence
+        recommendedActions,
+        lastWeekTotal: predictionData.last_week_total,
+        predictedWeekTotal: predictionData.predicted_week_total,
+        dailyPredictions: predictionData.daily_predictions
+      });
+      
+      toast.success('Custom analysis complete! View your prediction results below.');
+
+    } catch (error) {
+      console.error('Custom analysis failed:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      toast.error(error instanceof Error ? error.message : 'Please try again later');
+    } finally {
+      setIsCustomAnalysisLoading(false);
+    }
+  };
+
+  const generateRecommendations = (predictedChange: number, category: string): string[] => {
+    const recommendations: string[] = [];
+    
+    if (predictedChange > 10) {
+      recommendations.push(`Consider reducing your ${category.toLowerCase()} spending by ${Math.round(predictedChange)}%`);
+      recommendations.push('Set a weekly budget for this category');
+    } else if (predictedChange < -10) {
+      recommendations.push(`Your ${category.toLowerCase()} spending is trending down, which is positive`);
+      recommendations.push('Consider setting aside the savings for your financial goals');
+    } else {
+      recommendations.push(`Your ${category.toLowerCase()} spending is stable`);
+      recommendations.push('Continue monitoring your spending patterns');
+    }
+    
+    return recommendations;
+  };
 
   return (
     <section className="w-full py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
@@ -107,7 +304,52 @@ export default function BehaviorInsights() {
             Our AI identifies your spending patterns and behaviors to help you
             make better financial decisions
           </p>
+          
+          {/* Add Custom Analysis Button */}
+          <div className="mt-8">
+            <Button 
+              onClick={handleCustomAnalysis}
+              disabled={isCustomAnalysisLoading}
+              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white px-6 py-2 rounded-lg shadow-lg transition-all duration-300"
+            >
+              {isCustomAnalysisLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  Get Custom Analysis
+                </>
+              )}
+            </Button>
+          </div>
         </div>
+
+        {/* Display Custom Analysis Results */}
+        {prediction && prediction.behaviorId === 0 && (
+          <div className="mb-12">
+            <Card className="bg-gray-800/70 backdrop-blur-sm border border-gray-700 overflow-hidden">
+              <div className="h-1.5 w-full bg-gradient-to-r from-yellow-600 to-yellow-400"></div>
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-2 rounded-lg bg-yellow-500/10">
+                    <TrendingUp className="h-5 w-5 text-yellow-500" />
+                  </div>
+                  <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
+                    Custom Analysis
+                  </Badge>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Overall Spending Analysis</h3>
+                <p className="text-gray-400 mb-4">
+                  AI-powered analysis of your overall spending patterns and predictions
+                </p>
+                <PredictionDisplay prediction={prediction} behaviorId={0} />
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <Tabs
           defaultValue="impulse"
@@ -191,22 +433,38 @@ export default function BehaviorInsights() {
                       />
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-xs text-gray-500">
-                          Potential Savings
-                        </span>
-                        <p className="text-white font-semibold">
-                          {behavior.savings}
-                        </p>
+                    <div className="flex flex-col">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="text-xs text-gray-500">
+                            Potential Savings
+                          </span>
+                          <p className="text-white font-semibold">
+                            {behavior.savings}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-0 h-8 w-8 rounded-full disabled:opacity-50"
+                            onClick={() => handlePredictBehavior(behavior.id)}
+                            disabled={predictingBehaviorId === behavior.id}
+                          >
+                            {predictingBehaviorId === behavior.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <ArrowRight className="h-4 w-4" />
+                            )}
+                          </Button>
+                          {error && behavior.id === predictingBehaviorId && (
+                            <p className="text-xs text-red-400 mt-2">{error}</p>
+                          )}
+                        </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-0 h-8 w-8 rounded-full"
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
+                      {prediction && behavior.id === predictingBehaviorId && (
+                        <PredictionDisplay prediction={prediction} behaviorId={behavior.id} />
+                      )}
                     </div>
                   </CardContent>
                 </Card>
