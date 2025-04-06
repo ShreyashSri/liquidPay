@@ -168,7 +168,7 @@ export default function DashboardPage() {
               </CardDescription>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-2xl text-white">
-                  ₹{data.monthlySpending.toLocaleString()}
+                  ₹{18956.5}
                 </CardTitle>
                 <CreditCard className="h-5 w-5 text-yellow-500" />
               </div>
