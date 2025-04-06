@@ -11,6 +11,7 @@ router.post("/verifyEmail", verifyMail)
 router.post("/logout", logout)
 router.post("/forgotPassword", forgotPassword)
 router.post("/resetPassword/:resetPasswordToken", resetPassword)
+router.post("/verifyToken", verifyToken)
 
 
 export default router;

@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+
 import {
   Card,
   CardContent,
@@ -23,11 +27,9 @@ import {
   CreditCard,
   AlertCircle,
 } from "lucide-react";
-import RecentTransactions from "@/components/dashboard/recent-transactions";
 import SpendingAlerts from "@/components/dashboard/spending-alerts";
 import SavingsSummary from "@/components/dashboard/savings-summary";
 
-// Add type definitions for chart data
 interface MonthlySpendingData {
   month: string;
   amount: number;
@@ -45,35 +47,83 @@ interface CategoryData {
   color: string;
 }
 
-// Update the mock data with proper types
-const monthlySpending: MonthlySpendingData[] = [
-  { month: "Jan", amount: 4500 },
-  { month: "Feb", amount: 5200 },
-  { month: "Mar", amount: 4800 },
-  { month: "Apr", amount: 5100 },
-  { month: "May", amount: 4300 },
-  { month: "Jun", amount: 4700 },
-];
-
-const categoryData: CategoryData[] = [
-  { name: "Food", value: 35, color: "#ffd700" },
-  { name: "Entertainment", value: 20, color: "#c0c0c0" },
-  { name: "Shopping", value: 15, color: "#9c9c9c" },
-  { name: "Transport", value: 10, color: "#787878" },
-  { name: "Bills", value: 20, color: "#505050" },
-];
-
-const weeklyData: WeeklyData[] = [
-  { day: "Mon", needs: 500, wants: 300 },
-  { day: "Tue", needs: 450, wants: 250 },
-  { day: "Wed", needs: 600, wants: 400 },
-  { day: "Thu", needs: 550, wants: 350 },
-  { day: "Fri", needs: 700, wants: 500 },
-  { day: "Sat", needs: 400, wants: 600 },
-  { day: "Sun", needs: 350, wants: 450 },
-];
+interface DashboardData {
+  totalBalance: number;
+  monthlySpending: number;
+  savingsRate: number;
+  spendingAlerts: number;
+  monthlySpendingData: MonthlySpendingData[];
+  weeklyData: WeeklyData[];
+  categoryData: CategoryData[];
+}
 
 export default function DashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      const token = Cookies.get("token");
+
+      if (!token) {
+        console.error("❌ No token found in cookies");
+        return;
+      }
+
+      try {
+        const res = await axios.get("http://localhost:8188/api/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+        setData(res.data.data);
+      } catch (error) {
+        console.error("❌ Failed to fetch dashboard:", error);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  const transactions = [
+    {
+      id: 1,
+      name: "Grocery Shopping",
+      date: "2025-04-04",
+      amount: -1200,
+      type: "Debit",
+    },
+    {
+      id: 2,
+      name: "Salary Credited",
+      date: "2025-04-03",
+      amount: 25000,
+      type: "Credit",
+    },
+    {
+      id: 3,
+      name: "Electricity Bill",
+      date: "2025-04-02",
+      amount: -1800,
+      type: "Debit",
+    },
+    {
+      id: 4,
+      name: "Coffee",
+      date: "2025-04-01",
+      amount: -150,
+      type: "Debit",
+    },
+  ];
+
+  if (!data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Loading your dashboard...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black pt-24 pb-16">
       <div className="container mx-auto px-4">
@@ -97,7 +147,9 @@ export default function DashboardPage() {
                 Total Balance
               </CardDescription>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-2xl text-white">₹42,500</CardTitle>
+                <CardTitle className="text-2xl text-white">
+                  ₹{data.totalBalance.toLocaleString()}
+                </CardTitle>
                 <Wallet className="h-5 w-5 text-yellow-500" />
               </div>
             </CardHeader>
@@ -115,7 +167,9 @@ export default function DashboardPage() {
                 Monthly Spending
               </CardDescription>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-2xl text-white">₹15,200</CardTitle>
+                <CardTitle className="text-2xl text-white">
+                  ₹{data.monthlySpending.toLocaleString()}
+                </CardTitle>
                 <CreditCard className="h-5 w-5 text-yellow-500" />
               </div>
             </CardHeader>
@@ -133,7 +187,9 @@ export default function DashboardPage() {
                 Savings Rate
               </CardDescription>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-2xl text-white">24%</CardTitle>
+                <CardTitle className="text-2xl text-white">
+                  {data.savingsRate.toFixed(1)}%
+                </CardTitle>
                 <TrendingUp className="h-5 w-5 text-yellow-500" />
               </div>
             </CardHeader>
@@ -151,7 +207,9 @@ export default function DashboardPage() {
                 Spending Alerts
               </CardDescription>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-2xl text-white">3</CardTitle>
+                <CardTitle className="text-2xl text-white">
+                  {data.spendingAlerts}
+                </CardTitle>
                 <AlertCircle className="h-5 w-5 text-yellow-500" />
               </div>
             </CardHeader>
@@ -183,7 +241,7 @@ export default function DashboardPage() {
                     <div className="h-80">
                       <ChartContainer>
                         <LineChart
-                          data={monthlySpending}
+                          data={transactions}
                           index="month"
                           categories={["amount"]}
                           colors={["#ffd700"]}
@@ -197,7 +255,7 @@ export default function DashboardPage() {
                     <div className="h-80">
                       <ChartContainer>
                         <BarChart
-                          data={weeklyData}
+                          data={data.weeklyData}
                           index="day"
                           categories={["needs", "wants"]}
                           colors={["#c0c0c0", "#ffd700"]}
@@ -210,28 +268,12 @@ export default function DashboardPage() {
                 </Tabs>
               </CardContent>
             </Card>
-
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">
-                  Recent Transactions
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Your latest financial activities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RecentTransactions />
-              </CardContent>
-            </Card>
           </div>
 
           <div className="space-y-8">
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">
-                  Spending by Category
-                </CardTitle>
+                <CardTitle className="text-white">Spending by Category</CardTitle>
                 <CardDescription className="text-gray-400">
                   Where your money goes
                 </CardDescription>
@@ -240,14 +282,42 @@ export default function DashboardPage() {
                 <div className="h-80">
                   <ChartContainer>
                     <PieChart
-                      data={categoryData}
+                      data={data.categoryData}
                       index="name"
                       category="value"
-                      colors={categoryData.map((item) => item.color)}
+                      colors={data.categoryData.map((item) => item.color)}
                       valueFormatter={(value: number) => `${value}%`}
                       className="h-80"
                     />
                   </ChartContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-white text-lg font-semibold">Recent Transactions</CardTitle>
+              </CardHeader>
+              <CardContent className="px-0">
+                <div className="divide-y divide-gray-700">
+                  {transactions.map((txn) => (
+                    <div
+                      key={txn.id}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors"
+                    >
+                      <div>
+                        <p className="text-white text-sm font-medium">{txn.name}</p>
+                        <p className="text-xs text-gray-400">{txn.date}</p>
+                      </div>
+                      <div
+                        className={`text-sm font-semibold ${
+                          txn.amount > 0 ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
+                        {txn.amount > 0 ? "+" : "-"}₹{Math.abs(txn.amount)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

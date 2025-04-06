@@ -10,6 +10,7 @@ import budgetRoutes from './routes/budget.routes.js';
 import mongoose from 'mongoose';
 import { buyCodi, getBalance } from "./blockchain/codiService.js";
 import cookieParser from 'cookie-parser';
+import dashboardRoutes from './routes/dashboard.routes.js';
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:5173'],
     credentials: true
 }));
+app.use(cookieParser());
+
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRoutes);
@@ -26,6 +29,7 @@ app.use('/api/goals', goalRoutes);
 app.use('/api/transactions', txRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/budget', budgetRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 try {
     mongoose.connect(process.env.MONGODB_URI)

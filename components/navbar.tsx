@@ -20,6 +20,7 @@ interface User {
 }
 
 const navLinks = [
+  {name: "Dashboard", href:"/dashboard"},
   { name: "AI Features", href: "/features" },
   { name: "Behavior Analysis", href: "/behavior-analysis" },
   {
