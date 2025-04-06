@@ -112,6 +112,7 @@ export const genGoals = async (req, res) => {
             const summaryResponse = await fetch(`http://localhost:8188/api/summary/${userId}`);
             if (summaryResponse.ok) {
                 const contentType = summaryResponse.headers.get("content-type");
+                console.log("Summary response:", summaryResponse);
                 if (contentType && contentType.includes("application/json")) {
                     summaryData = await summaryResponse.json();
                     console.log("Summary data received:", summaryData);
@@ -133,6 +134,7 @@ export const genGoals = async (req, res) => {
       Don't give generalised goals make it as particular as possible.
       base the goals on the user's spending habits and financial situation.
       Goals should be realistic and achievable, but also challenging enough to encourage the user to save and invest.
+      Take the data and frame the goals so specific that it should be tailored to user's needs.
       Respond in JSON format like:
       [
         { "title": "Title1", "description": "Desc1", "targetAmount": 10000, "deadline": "2025-10-01", "currentAmount": 0, "reward": 500, "isCompleted": false, "isAI": true },
