@@ -136,6 +136,7 @@ export const genGoals = async (req, res) => {
       Goals should be realistic and achievable, but also challenging enough to encourage the user to save and invest.
       Take the data and frame the goals so specific that it should be tailored to user's needs.
       Reward should always be  5 SIT
+      Go very specific including the name of the person in the description and the goal.
       Respond in JSON format like:
       [
         { "title": "Title1", "description": "Desc1", "targetAmount": 10000, "deadline": "2025-10-01", "currentAmount": 0, "reward": 5, "isCompleted": false, "isAI": true },

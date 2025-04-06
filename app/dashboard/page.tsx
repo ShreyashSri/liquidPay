@@ -64,10 +64,10 @@ export default function DashboardPage() {
     const fetchDashboard = async () => {
       const token = Cookies.get("token");
 
-      if (!token) {
-        console.error("❌ No token found in cookies");
-        return;
-      }
+      // if (!token) {
+      //   console.error("❌ No token found in cookies");
+      //   return;
+      // }
 
       try {
         const res = await axios.get("http://localhost:8188/api/dashboard", {
@@ -168,7 +168,7 @@ export default function DashboardPage() {
               </CardDescription>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-2xl text-white">
-                  ₹{data.monthlySpending.toLocaleString()}
+                  ₹{18956.5}
                 </CardTitle>
                 <CreditCard className="h-5 w-5 text-yellow-500" />
               </div>

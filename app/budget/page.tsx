@@ -23,26 +23,19 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-interface TransactionItem {
-  _id: string;
+// Updated interface to match the actual data structure
+interface ExpenseItem {
   item: string;
   amount: number;
   time: string;
+  _id: string;
 }
 
-interface Transaction {
+interface DailyBudget {
   date: string;
-  needs: TransactionItem[];
-  wants: TransactionItem[];
-}
-
-interface BudgetItem {
-  _id?: string;
-  category: string;
-  amount: number;
-  type: "income" | "expense";
-  date: string;
-  description?: string;
+  _id: string;
+  needs: ExpenseItem[];
+  wants: ExpenseItem[];
 }
 
 interface BudgetSummary {
@@ -53,7 +46,7 @@ interface BudgetSummary {
 }
 
 export default function BudgetPage() {
-  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
+  const [budgetItems, setBudgetItems] = useState<DailyBudget[]>([]);
   const [summary, setSummary] = useState<BudgetSummary>({
     totalIncome: 0,
     totalExpenses: 0,
@@ -68,88 +61,64 @@ export default function BudgetPage() {
 
   // Form state for new budget item
   const [newItem, setNewItem] = useState({
-    category: "",
+    item: "",
     amount: "",
-    type: "expense",
-    description: "",
+    type: "needs", // Changed to "needs" or "wants"
+    time: new Date().toTimeString().substring(0, 5),
   });
 
   const fetchBudgetItems = async () => {
     try {
       setIsLoading(true);
       console.log("Starting to fetch budget items...");
-      
-      // First check authentication
+  
+      // Step 1: Check authentication
       const authResponse = await axios.get("http://localhost:8188/api/auth/checkAuth", {
         withCredentials: true,
       });
       console.log("Auth response:", authResponse.data);
-
+  
       if (!authResponse.data.success || !authResponse.data.user) {
         console.log("Authentication failed");
         setError("User not authenticated");
+        setIsLoading(false);
         return;
       }
-
+  
       const userId = authResponse.data.user._id;
       console.log("User ID:", userId);
-      
-      // Then fetch user's transactions
+      setUserId(userId);
+  
+      // Step 2: Fetch user's budget items
       const response = await axios.get(
-        `http://localhost:8188/api/transactions/${userId}`,
+        `http://localhost:8188/api/budget`,
         { withCredentials: true }
       );
-      console.log("Transactions response:", response.data);
-
+      console.log("Budget response:", response.data);
+  
       if (response.data.success) {
-        // Get all transactions from user model
-        const transactions = response.data.transactions || [];
-        console.log("Raw transactions:", transactions);
-        
-        // Flatten the transactions array to include both needs and wants
-        const flattenedTransactions = transactions.flatMap((tx: Transaction) => {
-          const needs = tx.needs.map((item: TransactionItem) => ({
-            _id: item._id,
-            category: item.item,
-            amount: item.amount,
-            type: "expense",
-            date: tx.date,
-            description: `Need: ${item.item} at ${item.time}`
-          }));
-          
-          const wants = tx.wants.map((item: TransactionItem) => ({
-            _id: item._id,
-            category: item.item,
-            amount: item.amount,
-            type: "expense",
-            date: tx.date,
-            description: `Want: ${item.item} at ${item.time}`
-          }));
-          
-          return [...needs, ...wants];
-        });
-
-        console.log("Flattened transactions:", flattenedTransactions);
-        setBudgetItems(flattenedTransactions);
-        calculateSummary(flattenedTransactions);
+        const items = response.data.items || [];
+        console.log("Budget items:", items);
+        setBudgetItems(items);
+        calculateSummary(items);
       } else {
-        console.log("Failed to fetch transactions:", response.data.message);
-        setError(response.data.message || "Failed to fetch transactions");
+        console.log("Failed to fetch budget items:", response.data.message);
+        setError(response.data.message || "Failed to fetch budget items");
       }
     } catch (error: any) {
       console.error("Error in fetchBudgetItems:", error);
       console.error("Error response:", error.response?.data);
-      setError(error.response?.data?.message || "Failed to fetch transactions");
+      setError(error.response?.data?.message || "Failed to fetch budget items");
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchBudgetItems();
   }, []);
-
-  const calculateSummary = (items: BudgetItem[]) => {
+  
+  const calculateSummary = (items: DailyBudget[]) => {
     console.log("Calculating summary for items:", items);
     if (!items || !Array.isArray(items)) {
       console.log("Invalid items array");
@@ -162,14 +131,27 @@ export default function BudgetPage() {
       return;
     }
 
-    const totalIncome = items
-      .filter(item => item?.type === "income")
-      .reduce((sum, item) => sum + (item?.amount || 0), 0);
+    // Calculate total of all needs and wants expenses
+    let totalExpenses = 0;
     
-    const totalExpenses = items
-      .filter(item => item?.type === "expense")
-      .reduce((sum, item) => sum + (item?.amount || 0), 0);
+    items.forEach(dailyBudget => {
+      // Sum up all needs expenses
+      if (dailyBudget.needs && Array.isArray(dailyBudget.needs)) {
+        dailyBudget.needs.forEach(need => {
+          totalExpenses += need.amount || 0;
+        });
+      }
+      
+      // Sum up all wants expenses
+      if (dailyBudget.wants && Array.isArray(dailyBudget.wants)) {
+        dailyBudget.wants.forEach(want => {
+          totalExpenses += want.amount || 0;
+        });
+      }
+    });
     
+    // Placeholder for income - you might need to adjust this based on your actual data structure
+    const totalIncome = 5000; // Example fixed income
     const balance = totalIncome - totalExpenses;
     const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
 
@@ -196,7 +178,7 @@ export default function BudgetPage() {
       return;
     }
   
-    if (!newItem.category || !newItem.amount || !newItem.type) {
+    if (!newItem.item || !newItem.amount) {
       setError("Please fill in all required fields");
       return;
     }
@@ -204,44 +186,52 @@ export default function BudgetPage() {
     try {
       setIsAdding(true);
       setError(null);
+      
+      console.log("Submitting form data:", newItem);
   
-      const now = new Date();
-      const time = now.toTimeString().split(' ')[0].substring(0, 5);
-  
+      // Format today's date in YYYY-MM-DD format
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Use the correct endpoint and data structure
       const response = await axios.post(
-        `http://localhost:8188/api/transactions/postx/${userId}`,
+        `http://localhost:8188/api/budget/add-item`,
         {
-          date: now.toISOString(),
-          type: newItem.type.toLowerCase(), // Ensure it's 'need' or 'want'
-          category: newItem.category,
-          amount: Number(newItem.amount),
-          description: newItem.description || "",
-          time: time
+          date: today,
+          itemType: newItem.type, // "needs" or "wants"
+          item: {
+            item: newItem.item,
+            amount: Number(newItem.amount),
+            time: newItem.time
+          }
         },
         { withCredentials: true }
       );
+      
+      console.log("Response from server:", response.data);
   
-      if (response.status === 200) {
+      if (response.data.success) {
+        console.log("Item added successfully");
         setNewItem({
-          category: "",
+          item: "",
           amount: "",
-          type: "need", // or "want" as default
-          description: "",
+          type: "needs", // Reset to default
+          time: new Date().toTimeString().substring(0, 5),
         });
         await fetchBudgetItems();
         setActiveTab("transactions");
       } else {
-        setError(response.data.message || "Failed to add transaction");
+        console.log("Failed to add item:", response.data.message);
+        setError(response.data.message || "Failed to add item");
       }
     } catch (error: any) {
-      console.error("Error adding transaction:", error);
-      setError(error.response?.data?.message || "Failed to add transaction");
+      console.error("Error adding item:", error);
+      console.error("Error response data:", error.response?.data);
+      setError(error.response?.data?.message || "Failed to add item");
     } finally {
       setIsAdding(false);
     }
   };
   
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewItem((prev) => ({ ...prev, [name]: value }));
@@ -254,6 +244,18 @@ export default function BudgetPage() {
       </div>
     );
   }
+
+  // Calculate total expenses for each day
+  const getTotalExpensesForDay = (day: DailyBudget): number => {
+    let total = 0;
+    if (day.needs && Array.isArray(day.needs)) {
+      day.needs.forEach(need => total += need.amount || 0);
+    }
+    if (day.wants && Array.isArray(day.wants)) {
+      day.wants.forEach(want => total += want.amount || 0);
+    }
+    return total;
+  };
 
   return (
     <div className="min-h-screen bg-black pt-24 pb-16">
@@ -270,7 +272,7 @@ export default function BudgetPage() {
             className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Transaction
+            Add Expense
           </Button>
         </div>
 
@@ -278,7 +280,7 @@ export default function BudgetPage() {
           <TabsList className="bg-gray-800 mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="add">Add Transaction</TabsTrigger>
+            <TabsTrigger value="add">Add Expense</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -356,36 +358,58 @@ export default function BudgetPage() {
                   <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
                 </div>
               ) : budgetItems && budgetItems.length > 0 ? (
-                budgetItems.map((item) => (
-                  <Card key={item._id} className="bg-gray-800/70 backdrop-blur-sm border border-gray-700">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">
-                            {item.category || 'Uncategorized'}
-                          </h3>
-                          <p className="text-gray-400">{item.description || 'No description'}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className={`text-lg font-bold ${item.type === "income" ? "text-green-500" : "text-red-500"}`}>
-                            {item.type === "income" ? "+" : "-"}₹{(item.amount || 0).toLocaleString()}
-                          </p>
-                          <p className="text-gray-400 text-sm">
-                            {item.date ? new Date(item.date).toLocaleDateString('en-IN', {
-                              day: '2-digit',
-                              month: '2-digit',
-                              year: 'numeric'
-                            }) : 'No date'}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
+                budgetItems
+                  .filter(day => day.needs.length > 0 || day.wants.length > 0) // Only show days with transactions
+                  .map((day) => (
+                    <Card key={day._id} className="bg-gray-800/70 backdrop-blur-sm border border-gray-700">
+                      <CardHeader>
+                        <CardTitle className="text-white flex justify-between">
+                          <span>{new Date(day.date).toLocaleDateString('en-IN', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}</span>
+                          <span className="text-red-500">₹{getTotalExpensesForDay(day).toLocaleString()}</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {day.needs.length > 0 && (
+                          <div className="mb-4">
+                            <h3 className="text-lg font-semibold text-white mb-2">Needs</h3>
+                            {day.needs.map(need => (
+                              <div key={need._id} className="flex justify-between items-center mb-2 pb-2 border-b border-gray-700">
+                                <div>
+                                  <p className="text-white">{need.item}</p>
+                                  <p className="text-gray-400 text-sm">{need.time}</p>
+                                </div>
+                                <p className="text-red-500 font-medium">₹{need.amount.toLocaleString()}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {day.wants.length > 0 && (
+                          <div>
+                            <h3 className="text-lg font-semibold text-white mb-2">Wants</h3>
+                            {day.wants.map(want => (
+                              <div key={want._id} className="flex justify-between items-center mb-2 pb-2 border-b border-gray-700">
+                                <div>
+                                  <p className="text-white">{want.item}</p>
+                                  <p className="text-gray-400 text-sm">{want.time}</p>
+                                </div>
+                                <p className="text-red-500 font-medium">₹{want.amount.toLocaleString()}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
               ) : (
                 <Card className="bg-gray-800/70 backdrop-blur-sm border border-gray-700">
                   <CardContent className="p-6 text-center">
-                    <p className="text-gray-400">No transactions found. Add your first transaction!</p>
+                    <p className="text-gray-400">No transactions found. Add your first expense!</p>
                   </CardContent>
                 </Card>
               )}
@@ -395,20 +419,20 @@ export default function BudgetPage() {
           <TabsContent value="add" className="space-y-6">
             <Card className="bg-gray-800/70 backdrop-blur-sm border border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Add New Transaction</CardTitle>
+                <CardTitle className="text-white">Add New Expense</CardTitle>
                 <CardDescription className="text-gray-400">
-                  Record your income or expense
+                  Record your daily needs and wants
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={addBudgetItem} className="space-y-4">
                   <div>
-                    <Label className="text-white">Category</Label>
+                    <Label className="text-white">Item Name</Label>
                     <Input
-                      name="category"
-                      value={newItem.category}
+                      name="item"
+                      value={newItem.item}
                       onChange={handleInputChange}
-                      placeholder="e.g., Salary, Groceries"
+                      placeholder="e.g., Groceries, Movie Ticket"
                       className="bg-gray-700 border-gray-600 text-white"
                       required
                     />
@@ -426,7 +450,7 @@ export default function BudgetPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-white">Type</Label>
+                    <Label className="text-white">Category</Label>
                     <select
                       name="type"
                       value={newItem.type}
@@ -434,18 +458,19 @@ export default function BudgetPage() {
                       className="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
                       required
                     >
-                      <option value="income">Income</option>
-                      <option value="expense">Expense</option>
+                      <option value="needs">Needs</option>
+                      <option value="wants">Wants</option>
                     </select>
                   </div>
                   <div>
-                    <Label className="text-white">Description (Optional)</Label>
+                    <Label className="text-white">Time</Label>
                     <Input
-                      name="description"
-                      value={newItem.description}
+                      name="time"
+                      type="time"
+                      value={newItem.time}
                       onChange={handleInputChange}
-                      placeholder="Add a note..."
                       className="bg-gray-700 border-gray-600 text-white"
+                      required
                     />
                   </div>
                   <Button
@@ -458,7 +483,7 @@ export default function BudgetPage() {
                     ) : (
                       <Plus className="h-4 w-4 mr-2" />
                     )}
-                    Add Transaction
+                    Add Expense
                   </Button>
                 </form>
               </CardContent>
@@ -468,4 +493,4 @@ export default function BudgetPage() {
       </div>
     </div>
   );
-} 
+}

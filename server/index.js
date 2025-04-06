@@ -11,6 +11,8 @@ import mongoose from 'mongoose';
 import { buyCodi, getBalance } from "./blockchain/codiService.js";
 import cookieParser from 'cookie-parser';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import userRoutes from './routes/user.routes.js';
+
 
 const app = express();
 
@@ -30,7 +32,7 @@ app.use('/api/transactions', txRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/budget', budgetRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-
+app.use('/api/user', userRoutes);
 try {
     mongoose.connect(process.env.MONGODB_URI)
     console.log('Connected to MongoDB')
