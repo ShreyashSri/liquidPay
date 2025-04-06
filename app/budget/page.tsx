@@ -190,36 +190,46 @@ export default function BudgetPage() {
 
   const addBudgetItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+  
     if (!userId) {
       setError("Please log in to add budget items");
       return;
     }
-
+  
+    if (!newItem.category || !newItem.amount || !newItem.type) {
+      setError("Please fill in all required fields");
+      return;
+    }
+  
     try {
       setIsAdding(true);
       setError(null);
-
+  
+      const now = new Date();
+      const time = now.toTimeString().split(' ')[0].substring(0, 5);
+  
       const response = await axios.post(
         `http://localhost:8188/api/transactions/postx/${userId}`,
         {
-          date: new Date(),
-          type: newItem.type === "income" ? "need" : "want",
+          date: now.toISOString(),
+          type: newItem.type.toLowerCase(), // Ensure it's 'need' or 'want'
           category: newItem.category,
           amount: Number(newItem.amount),
-          description: newItem.description
+          description: newItem.description || "",
+          time: time
         },
         { withCredentials: true }
       );
-
-      if (response.data.success) {
+  
+      if (response.status === 200) {
         setNewItem({
           category: "",
           amount: "",
-          type: "expense",
+          type: "need", // or "want" as default
           description: "",
         });
         await fetchBudgetItems();
+        setActiveTab("transactions");
       } else {
         setError(response.data.message || "Failed to add transaction");
       }
@@ -230,6 +240,7 @@ export default function BudgetPage() {
       setIsAdding(false);
     }
   };
+  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
