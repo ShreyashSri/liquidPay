@@ -69,7 +69,7 @@ export const getSpendingPatterns = async (req, res) => {
     }
 };
 
-// Get behavior insights using Gemini
+// KEEP original behavior insights using Gemini
 export const getBehaviorInsights = async (req, res) => {
     const { userId } = req.params;
 
@@ -120,6 +120,61 @@ export const getBehaviorInsights = async (req, res) => {
     } catch (error) {
         console.error("Error in getBehaviorInsights:", error);
         res.status(500).json({ success: false, message: "Error generating behavior insights" });
+    }
+};
+
+// ADD NEW function for needs vs wants categorization
+export const getNeedsWantsCategories = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Process transactions to get behavior data
+        const transactionData = processTransactionData(user.transactions);
+        
+        const prompt = `
+        Based on this user's transaction data: ${JSON.stringify(transactionData)},
+        analyze their spending behaviors and categorize them into "needs" (essential expenses) and "wants" (non-essential/discretionary expenses).
+        
+        For "needs", identify essential expenses like groceries, utilities, rent/mortgage, transportation, healthcare, 
+        insurance, and debt payments. For each need, include: id, title, description, impact (high/medium), 
+        amount (monthly average spending), icon (home/grocery/health/transport), progress (percentage), 
+        and details (detailed analysis).
+        
+        For "wants", identify non-essential expenses like dining out, entertainment, shopping, subscriptions, 
+        hobbies, and luxury items. For each want, include: id, title, description, impact (high/medium), 
+        amount (monthly average spending), icon (shopping/cafe/food/film/subscription), progress (percentage), 
+        and details (detailed analysis).
+        
+        Respond in JSON format with two arrays: "needs" and "wants".
+        `;
+
+        console.log("Generating needs vs wants insights with Gemini AI...");
+        const response = await fetchGeminiAnalysis(prompt);
+        
+        let categories;
+        try {
+            categories = JSON.parse(response);
+        } catch (error) {
+            console.error("Error parsing Gemini response:", error);
+            return res.status(500).json({ 
+                success: false, 
+                message: "Error parsing AI response",
+                rawResponse: response
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            categories
+        });
+    } catch (error) {
+        console.error("Error in getNeedsWantsCategories:", error);
+        res.status(500).json({ success: false, message: "Error generating needs vs wants insights" });
     }
 };
 
@@ -354,4 +409,4 @@ function processTransactionData(transactions) {
     });
 
     return processedData;
-} 
+}
