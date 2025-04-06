@@ -23,6 +23,19 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
+interface TransactionItem {
+  _id: string;
+  item: string;
+  amount: number;
+  time: string;
+}
+
+interface Transaction {
+  date: string;
+  needs: TransactionItem[];
+  wants: TransactionItem[];
+}
+
 interface BudgetItem {
   _id?: string;
   category: string;
@@ -94,8 +107,8 @@ export default function BudgetPage() {
         console.log("Raw transactions:", transactions);
         
         // Flatten the transactions array to include both needs and wants
-        const flattenedTransactions = transactions.flatMap(tx => {
-          const needs = tx.needs.map(item => ({
+        const flattenedTransactions = transactions.flatMap((tx: Transaction) => {
+          const needs = tx.needs.map((item: TransactionItem) => ({
             _id: item._id,
             category: item.item,
             amount: item.amount,
@@ -104,7 +117,7 @@ export default function BudgetPage() {
             description: `Need: ${item.item} at ${item.time}`
           }));
           
-          const wants = tx.wants.map(item => ({
+          const wants = tx.wants.map((item: TransactionItem) => ({
             _id: item._id,
             category: item.item,
             amount: item.amount,
