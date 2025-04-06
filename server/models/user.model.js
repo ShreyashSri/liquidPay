@@ -30,7 +30,22 @@ const userSchema = new mongoose.Schema({
   resetPasswordOTP: { type: String },
 
   // 👇 Structured Transactions
-  transactions: [transactionSchema]
+  transactions: [transactionSchema],
+
+  // 👇 New transactions array
+  newTransactions: [{
+    category: String,
+    amount: Number,
+    type: {
+      type: String,
+      enum: ["income", "expense"],
+    },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    description: String,
+  }],
 });
 
 const User = mongoose.model('User', userSchema);
