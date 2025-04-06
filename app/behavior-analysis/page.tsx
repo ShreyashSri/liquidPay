@@ -96,51 +96,52 @@ const locationSpending: SpendingData[] = [
 const behaviors: BehaviorsData = {
   impulse: [
     {
-      id: 1,
-      title: "Late Night Shopping",
-      description: "You tend to make unplanned purchases between 10PM and 2AM.",
-      impact: "high",
-      savings: "₹3,200/month",
-      icon: <ShoppingBag className="h-5 w-5 text-red-500" />,
-      progress: 75,
-      details:
-        "Analysis of your transaction history shows that 35% of your non-essential purchases occur late at night, often from e-commerce websites. These purchases are 60% more likely to be returned or unused compared to daytime purchases.",
-    },
-    {
-      id: 2,
-      title: "Daily Coffee Runs",
-      description:
-        "You spend on coffee shops 18 times per month, averaging ₹250 per visit.",
-      impact: "medium",
-      savings: "₹2,500/month",
-      icon: <Coffee className="h-5 w-5 text-yellow-500" />,
-      progress: 60,
-      details:
-        "Your spending at coffee shops has increased by 22% in the last 3 months. You visit coffee shops most frequently on weekday mornings, with an average transaction of ₹250. Reducing to 10 visits per month could save you ₹2,000.",
-    },
-    {
       id: 3,
-      title: "Food Delivery",
+      title: "Food Delivery Frenzy",
       description:
-        "You order food delivery 3-4 times per week, often during work hours.",
+        "You regularly order food 3–4 times a week, mostly out of convenience during work hours.",
       impact: "medium",
       savings: "₹4,000/month",
       icon: <Utensils className="h-5 w-5 text-yellow-500" />,
       progress: 55,
       details:
-        "You spend approximately ₹8,000 per month on food delivery services, primarily during weekday lunches. This is 40% higher than the average for your income bracket. Meal prepping could save you up to ₹4,000 monthly.",
+        "Your lunch-hour deliveries have averaged ₹8,000 monthly—significantly above the average for similar earners. Prepping a few meals in advance could slash this number in half, keeping convenience *and* savings in balance.",
+    },
+    {
+      id: 1,
+      title: "Late Night Impulses",
+      description:
+        "You often shop online between 10PM and 2AM, when impulse control is lowest.",
+      impact: "high",
+      savings: "₹3,200/month",
+      icon: <ShoppingBag className="h-5 w-5 text-red-500" />,
+      progress: 75,
+      details:
+        "Over 35% of your non-essential spending occurs during late-night hours, and these purchases are 60% more likely to be returned or go unused. Adding items to a wishlist instead of checking out instantly could lead to better decisions—and major savings.",
     },
     {
       id: 4,
-      title: "Subscription Overload",
+      title: "Streaming & Subscriptions",
       description:
-        "You have 8 active subscriptions, but regularly use only 4 of them.",
+        "You're subscribed to 8 services but only actively use half of them.",
       impact: "medium",
       savings: "₹1,800/month",
       icon: <CreditCard className="h-5 w-5 text-yellow-500" />,
       progress: 65,
       details:
-        "You currently spend ₹3,200 monthly on digital subscriptions. Usage data suggests you actively use only 50% of these services. Cancelling unused subscriptions could save ₹1,800 monthly.",
+        "You're spending ₹3,200/month across multiple platforms, but usage logs suggest you're only engaging with 4 consistently. Trimming unused subscriptions isn’t sacrifice—it’s smart prioritization.",
+    },
+    {
+      id: 2,
+      title: "Daily Café Habit",
+      description:
+        "You frequent cafés 18 times a month, turning a small treat into a major expense.",
+      impact: "medium",
+      savings: "₹2,500/month",
+      icon: <Coffee className="h-5 w-5 text-yellow-500" />,
+      progress: 60,
+      details:
+        "Your average visit costs ₹250, often on weekday mornings. Cutting this to 10 monthly visits or switching to homemade brews could save you up to ₹2,000 without losing your caffeine fix.",
     },
   ],
   positive: [
@@ -650,11 +651,11 @@ export default function BehaviorAnalysisPage() {
                     <TabsList className="bg-gray-700 mb-6">
                       <TabsTrigger value="impulse">
                         <TrendingDown className="h-4 w-4 mr-2 text-red-500" />
-                        Impulse Behaviors
+                        Wants
                       </TabsTrigger>
                       <TabsTrigger value="positive">
                         <TrendingUp className="h-4 w-4 mr-2 text-green-500" />
-                        Positive Habits
+                        Needs
                       </TabsTrigger>
                     </TabsList>
 
