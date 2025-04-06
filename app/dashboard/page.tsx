@@ -64,10 +64,10 @@ export default function DashboardPage() {
     const fetchDashboard = async () => {
       const token = Cookies.get("token");
 
-      if (!token) {
-        console.error("❌ No token found in cookies");
-        return;
-      }
+      // if (!token) {
+      //   console.error("❌ No token found in cookies");
+      //   return;
+      // }
 
       try {
         const res = await axios.get("http://localhost:8188/api/dashboard", {

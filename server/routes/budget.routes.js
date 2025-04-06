@@ -11,7 +11,7 @@ router.use(verifyToken);
 router.get("/", getBudgetItems);
 
 // Add a new budget item
-router.post("/", addBudgetItem);
+router.post("/", verifyToken,addBudgetItem);
 
 // Delete a budget item
 router.delete("/:itemId", deleteBudgetItem);

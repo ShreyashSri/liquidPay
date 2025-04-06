@@ -78,35 +78,34 @@ export default function BudgetPage() {
     try {
       setIsLoading(true);
       console.log("Starting to fetch budget items...");
-      
-      // First check authentication
+  
+      // Step 1: Check authentication
       const authResponse = await axios.get("http://localhost:8188/api/auth/checkAuth", {
         withCredentials: true,
       });
       console.log("Auth response:", authResponse.data);
-
+  
       if (!authResponse.data.success || !authResponse.data.user) {
         console.log("Authentication failed");
         setError("User not authenticated");
         return;
       }
-
+  
       const userId = authResponse.data.user._id;
       console.log("User ID:", userId);
-      
-      // Then fetch user's transactions
+  
+      // Step 2: Fetch user's transactions
       const response = await axios.get(
         `http://localhost:8188/api/transactions/${userId}`,
         { withCredentials: true }
       );
       console.log("Transactions response:", response.data);
-
+  
       if (response.data.success) {
-        // Get all transactions from user model
         const transactions = response.data.transactions || [];
         console.log("Raw transactions:", transactions);
-        
-        // Flatten the transactions array to include both needs and wants
+  
+        // Flatten the needs & wants
         const flattenedTransactions = transactions.flatMap((tx: Transaction) => {
           const needs = tx.needs.map((item: TransactionItem) => ({
             _id: item._id,
@@ -116,7 +115,7 @@ export default function BudgetPage() {
             date: tx.date,
             description: `Need: ${item.item} at ${item.time}`
           }));
-          
+  
           const wants = tx.wants.map((item: TransactionItem) => ({
             _id: item._id,
             category: item.item,
@@ -125,10 +124,10 @@ export default function BudgetPage() {
             date: tx.date,
             description: `Want: ${item.item} at ${item.time}`
           }));
-          
+  
           return [...needs, ...wants];
         });
-
+  
         console.log("Flattened transactions:", flattenedTransactions);
         setBudgetItems(flattenedTransactions);
         calculateSummary(flattenedTransactions);
@@ -144,10 +143,11 @@ export default function BudgetPage() {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchBudgetItems();
   }, []);
+  
 
   const calculateSummary = (items: BudgetItem[]) => {
     console.log("Calculating summary for items:", items);
