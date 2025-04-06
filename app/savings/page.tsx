@@ -117,6 +117,18 @@ export default function SavingsPage() {
       setIsGenerating(true);
       setError(null);
 
+      // First check if there are any existing goals
+      const existingGoalsResponse = await axios.get(
+        `http://localhost:8188/api/goals/${userId}`,
+        { withCredentials: true }
+      );
+
+      if (existingGoalsResponse.data.success && existingGoalsResponse.data.goals.length > 0) {
+        setError("You already have goals. Please complete them before generating new ones.");
+        setIsGenerating(false);
+        return;
+      }
+
       const goalsResponse = await axios.post(
         `http://localhost:8188/api/goals/generate/${userId}`,
         {},
@@ -124,7 +136,6 @@ export default function SavingsPage() {
       );
 
       if (goalsResponse.data.success) {
-        // Fetch updated goals list
         await fetchGoals(userId);
         console.log("Generated 5 personalized savings goals!");
       } else {
@@ -156,13 +167,25 @@ export default function SavingsPage() {
       setIsCreating(true);
       setError(null);
 
+      // First check if there are any existing goals
+      const existingGoalsResponse = await axios.get(
+        `http://localhost:8188/api/goals/${userId}`,
+        { withCredentials: true }
+      );
+
+      if (existingGoalsResponse.data.success && existingGoalsResponse.data.goals.length > 0) {
+        setError("You already have goals. Please complete or delete them before creating new ones.");
+        setIsCreating(false);
+        return;
+      }
+
       const goalResponse = await axios.post(
         `http://localhost:8188/api/goals/${userId}`,
         {
           ...newGoal,
           isAI: false,
           currentAmount: 0,
-          reward: Math.floor(parseFloat(newGoal.targetAmount) * 0.1), // 10% of target as reward
+          reward: 5, // Fixed reward of 5 SIT
         },
         { withCredentials: true }
       );
@@ -174,7 +197,7 @@ export default function SavingsPage() {
           targetAmount: "",
           deadline: "",
         });
-        await fetchGoals(userId); // Refresh goals after creation
+        await fetchGoals(userId);
         console.log("Goal created successfully!");
       } else {
         setError(goalResponse.data.message || "Failed to create goal");
@@ -201,6 +224,11 @@ export default function SavingsPage() {
         // Remove the goal from the local state
         setGoals(prevGoals => prevGoals.filter(g => g._id !== goalId));
         console.log("Goal completed!");
+        try {
+          const addRewardRes = await axios.post(`http://localhost:8188/api/goals/dailyreward/${userId}`);
+        } catch (rewardError: any) {
+          console.error("Error adding reward:", rewardError);
+        }
       } else {
         console.error(response.data.message || "Failed to complete goal");
       }
@@ -327,10 +355,6 @@ export default function SavingsPage() {
                               <Coins className="h-3 w-3 mr-1" />
                               Current: ₹{Number(goal.currentAmount).toLocaleString()}
                             </Badge>
-                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                              <Gift className="h-3 w-3 mr-1" />
-                              Reward: {Number(goal.reward)} SIT
-                            </Badge>
                             <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
                               <Calendar className="h-3 w-3 mr-1" />
                               Deadline: {new Date(goal.deadline).toLocaleDateString()}
@@ -374,6 +398,15 @@ export default function SavingsPage() {
                             )}%`,
                           }}
                         />
+                      </div>
+                      <div className="mt-4 flex items-center justify-end gap-2">
+                        <div className="flex flex-col items-end">
+                          <div className="flex items-center gap-2">
+                            <Coins className="h-6 w-6 text-yellow-500" />
+                            <span className="text-yellow-500 font-bold text-lg">5 SIT</span>
+                          </div>
+                          <span className="text-gray-400 text-sm">Reward on completion</span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -499,10 +532,6 @@ export default function SavingsPage() {
                             <Coins className="h-3 w-3 mr-1" />
                             Current: ₹{Number(goal.currentAmount).toLocaleString()}
                           </Badge>
-                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                            <Gift className="h-3 w-3 mr-1" />
-                            Reward: {Number(goal.reward)} SIT
-                          </Badge>
                           <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
                             <Calendar className="h-3 w-3 mr-1" />
                             Deadline: {new Date(goal.deadline).toLocaleDateString()}
@@ -546,6 +575,15 @@ export default function SavingsPage() {
                           )}%`,
                         }}
                       />
+                    </div>
+                    <div className="mt-4 flex items-center justify-end gap-2">
+                      <div className="flex flex-col items-end">
+                        <div className="flex items-center gap-2">
+                          <Coins className="h-6 w-6 text-yellow-500" />
+                          <span className="text-yellow-500 font-bold text-lg">5 SIT</span>
+                        </div>
+                        <span className="text-gray-400 text-sm">Reward on completion</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

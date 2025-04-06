@@ -27,8 +27,26 @@ import RecentTransactions from "@/components/dashboard/recent-transactions";
 import SpendingAlerts from "@/components/dashboard/spending-alerts";
 import SavingsSummary from "@/components/dashboard/savings-summary";
 
-// Mock data
-const monthlySpending = [
+// Add type definitions for chart data
+interface MonthlySpendingData {
+  month: string;
+  amount: number;
+}
+
+interface WeeklyData {
+  day: string;
+  needs: number;
+  wants: number;
+}
+
+interface CategoryData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+// Update the mock data with proper types
+const monthlySpending: MonthlySpendingData[] = [
   { month: "Jan", amount: 4500 },
   { month: "Feb", amount: 5200 },
   { month: "Mar", amount: 4800 },
@@ -37,7 +55,7 @@ const monthlySpending = [
   { month: "Jun", amount: 4700 },
 ];
 
-const categoryData = [
+const categoryData: CategoryData[] = [
   { name: "Food", value: 35, color: "#ffd700" },
   { name: "Entertainment", value: 20, color: "#c0c0c0" },
   { name: "Shopping", value: 15, color: "#9c9c9c" },
@@ -45,7 +63,7 @@ const categoryData = [
   { name: "Bills", value: 20, color: "#505050" },
 ];
 
-const weeklyData = [
+const weeklyData: WeeklyData[] = [
   { day: "Mon", needs: 500, wants: 300 },
   { day: "Tue", needs: 450, wants: 250 },
   { day: "Wed", needs: 600, wants: 400 },
@@ -169,7 +187,7 @@ export default function DashboardPage() {
                           index="month"
                           categories={["amount"]}
                           colors={["#ffd700"]}
-                          valueFormatter={(value) => `₹${value}`}
+                          valueFormatter={(value: number) => `₹${value}`}
                           className="h-80"
                         />
                       </ChartContainer>
@@ -183,7 +201,7 @@ export default function DashboardPage() {
                           index="day"
                           categories={["needs", "wants"]}
                           colors={["#c0c0c0", "#ffd700"]}
-                          valueFormatter={(value) => `₹${value}`}
+                          valueFormatter={(value: number) => `₹${value}`}
                           className="h-80"
                         />
                       </ChartContainer>
@@ -226,7 +244,7 @@ export default function DashboardPage() {
                       index="name"
                       category="value"
                       colors={categoryData.map((item) => item.color)}
-                      valueFormatter={(value) => `${value}%`}
+                      valueFormatter={(value: number) => `${value}%`}
                       className="h-80"
                     />
                   </ChartContainer>

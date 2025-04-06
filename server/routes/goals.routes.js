@@ -13,7 +13,7 @@ router.post("/generate/:userId", genGoals);
 router.delete("/complete/:goalId", completeGoal);
 
 // 🧹 Daily purge: calculate completed goals, reward, and reset
-router.post("/dailyreward", dailyGoalPurgeAndReward);
+router.post("/dailyreward/:userId", dailyGoalPurgeAndReward);
 
 
 export default router;
