@@ -128,16 +128,17 @@ export const genGoals = async (req, res) => {
 
         const prompt = `
       Based on this user's spending summary: ${JSON.stringify(summaryData)},
-      and their name: ${user.fullname},
+      and their name: ${user.fullname}, their age is ${user.age},
       generate 5 unique, personalized financial goals. Each goal should be motivational, brief, and suitable for young adults.
       For each goal, include these fields: title, description, targetAmount (a number between 5000-50000), deadline (a date 1-6 months from now), currentAmount (0), reward (5-10% of targetAmount), isCompleted (false), isAI (true).
       Don't give generalised goals make it as particular as possible.
       base the goals on the user's spending habits and financial situation.
       Goals should be realistic and achievable, but also challenging enough to encourage the user to save and invest.
       Take the data and frame the goals so specific that it should be tailored to user's needs.
+      Reward should always be  5 SIT
       Respond in JSON format like:
       [
-        { "title": "Title1", "description": "Desc1", "targetAmount": 10000, "deadline": "2025-10-01", "currentAmount": 0, "reward": 500, "isCompleted": false, "isAI": true },
+        { "title": "Title1", "description": "Desc1", "targetAmount": 10000, "deadline": "2025-10-01", "currentAmount": 0, "reward": 5, "isCompleted": false, "isAI": true },
         ...
       ]
     `;
