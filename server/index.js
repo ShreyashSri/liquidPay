@@ -29,7 +29,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/web3', blockChainRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/transactions', txRoutes);
-app.use('/api/transactions', transactionsRoutes);
 app.use('/api/budget', budgetRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/user', userRoutes);

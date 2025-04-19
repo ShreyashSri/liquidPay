@@ -65,6 +65,7 @@
     "react-day-picker": "latest",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.1",
+    "react-hot": "^0.0.1",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
     "react-native": "^0.78.2",
@@ -75,6 +76,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.175.0",
+    "toast": "^0.5.4",
     "vaul": "^0.9.9",
     "zod": "^3.24.2"
   },

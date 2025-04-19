@@ -2,48 +2,105 @@ import mongoose from "mongoose";
 import User from "../models/user.model.js"; // adjust if path differs
 import moment from "moment"; // for date manipulation
 
+
 export const getTx = async (req, res) => {
-    try {
-        const { id } = req.params; // user ID passed as query param
-        const { duration } = req.query;
+  try {
+    const { id } = req.params; // user ID from URL params
+    const { duration } = req.query; // 'w', 'm', or 'd'
 
-        if (!id || !['w', 'm', 'd'].includes(duration)) {
-            return res.status(400).json({ error: "Invalid user ID or duration" });
-        }
-
-        const user = await User.findById(id);
-        if (!user) return res.status(404).json({ error: "User not found" });
-
-        const now = moment();
-        let start;
-
-        switch (duration) {
-            case 'w':
-                start = moment().startOf('week');
-                break;
-            case 'm':
-                start = moment().startOf('month');
-                break;
-            case 'd':
-                start = moment().startOf('day');
-                break;
-        }
-
-        const filteredTx = user.transactions.filter((tx) =>
-            moment(tx.date).isSameOrAfter(start)
-        );
-
-        res.status(200).json({
-            user: user.username,
-            range: duration,
-            totalTransactions: filteredTx.length,
-            transactions: filteredTx
-        });
-    } catch (err) {
-        console.error("❌ Error fetching transactions:", err);
-        res.status(500).json({ error: "Internal server error" });
+    // Validate input
+    if (!id || !['w', 'm', 'd'].includes(duration)) {
+      return res.status(400).json({ error: "Invalid user ID or duration" });
     }
+
+    // Fetch user data
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Determine the start date based on the selected duration
+    const now = moment();
+    let start;
+
+    switch (duration) {
+      case 'w':
+        start = moment().startOf('week');
+        break;
+      case 'm':
+        start = moment().startOf('month');
+        break;
+      case 'd':
+        start = moment().startOf('day');
+        break;
+      default:
+        start = now;
+    }
+
+    // Filter transactions by the date range
+    const filteredTx = user.transactions.filter((tx) =>
+      moment(tx.date).isSameOrAfter(start)
+    );
+
+    // Group transactions by date and category
+    const groupedTx = {};
+
+    filteredTx.forEach((tx) => {
+      const txDate = moment(tx.date).format("YYYY-MM-DD");
+
+      // Initialize the date object if not already present
+      if (!groupedTx[txDate]) {
+        groupedTx[txDate] = {
+          date: txDate,
+          needs: [],
+          wants: [],
+        };
+      }
+
+      // Loop through needs and wants and classify them
+      tx.needs.forEach((item) => {
+        groupedTx[txDate].needs.push(item);
+      });
+
+      tx.wants.forEach((item) => {
+        groupedTx[txDate].wants.push(item);
+      });
+    });
+
+    // Convert to array and sort by date ascending
+    const sortedGroupedTx = Object.values(groupedTx).sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+
+    // Limit the results based on the duration
+    let limitedTx;
+    switch (duration) {
+      case 'w':
+        limitedTx = sortedGroupedTx.slice(0, 7); // Last 7 days of transactions
+        break;
+      case 'm':
+        limitedTx = sortedGroupedTx.slice(0, 30); // Last 30 days of transactions
+        break;
+      case 'd':
+        limitedTx = sortedGroupedTx.slice(0, 1); // Last 1 day of transactions
+        break;
+      default:
+        limitedTx = sortedGroupedTx;
+    }
+
+    // Send the filtered and grouped transactions as a response
+    res.status(200).json({
+      user: user.username,
+      range: duration,
+      totalDays: limitedTx.length,
+      transactions: limitedTx,
+    });
+
+  } catch (err) {
+    console.error("❌ Error fetching transactions:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
+
+
 
 export const getSpendingSummary = async (req, res) => {
     const { userId } = req.params;

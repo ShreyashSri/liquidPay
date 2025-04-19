@@ -71,31 +71,31 @@ export default function BudgetPage() {
     try {
       setIsLoading(true);
       console.log("Starting to fetch budget items...");
-  
+
       // Step 1: Check authentication
       const authResponse = await axios.get("http://localhost:8188/api/auth/checkAuth", {
         withCredentials: true,
       });
       console.log("Auth response:", authResponse.data);
-  
+
       if (!authResponse.data.success || !authResponse.data.user) {
         console.log("Authentication failed");
         setError("User not authenticated");
         setIsLoading(false);
         return;
       }
-  
+
       const userId = authResponse.data.user._id;
       console.log("User ID:", userId);
       setUserId(userId);
-  
+
       // Step 2: Fetch user's budget items
       const response = await axios.get(
         `http://localhost:8188/api/budget`,
         { withCredentials: true }
       );
       console.log("Budget response:", response.data);
-  
+
       if (response.data.success) {
         const items = response.data.items || [];
         console.log("Budget items:", items);
@@ -113,11 +113,11 @@ export default function BudgetPage() {
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchBudgetItems();
   }, []);
-  
+
   const calculateSummary = (items: DailyBudget[]) => {
     console.log("Calculating summary for items:", items);
     if (!items || !Array.isArray(items)) {
@@ -133,7 +133,7 @@ export default function BudgetPage() {
 
     // Calculate total of all needs and wants expenses
     let totalExpenses = 0;
-    
+
     items.forEach(dailyBudget => {
       // Sum up all needs expenses
       if (dailyBudget.needs && Array.isArray(dailyBudget.needs)) {
@@ -141,7 +141,7 @@ export default function BudgetPage() {
           totalExpenses += need.amount || 0;
         });
       }
-      
+
       // Sum up all wants expenses
       if (dailyBudget.wants && Array.isArray(dailyBudget.wants)) {
         dailyBudget.wants.forEach(want => {
@@ -149,7 +149,7 @@ export default function BudgetPage() {
         });
       }
     });
-    
+
     // Placeholder for income - you might need to adjust this based on your actual data structure
     const totalIncome = 5000; // Example fixed income
     const balance = totalIncome - totalExpenses;
@@ -172,26 +172,26 @@ export default function BudgetPage() {
 
   const addBudgetItem = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!userId) {
       setError("Please log in to add budget items");
       return;
     }
-  
+
     if (!newItem.item || !newItem.amount) {
       setError("Please fill in all required fields");
       return;
     }
-  
+
     try {
       setIsAdding(true);
       setError(null);
-      
+
       console.log("Submitting form data:", newItem);
-  
+
       // Format today's date in YYYY-MM-DD format
       const today = new Date().toISOString().split('T')[0];
-      
+
       // Use the correct endpoint and data structure
       const response = await axios.post(
         `http://localhost:8188/api/budget/add-item`,
@@ -206,9 +206,9 @@ export default function BudgetPage() {
         },
         { withCredentials: true }
       );
-      
+
       console.log("Response from server:", response.data);
-  
+
       if (response.data.success) {
         console.log("Item added successfully");
         setNewItem({
@@ -231,7 +231,7 @@ export default function BudgetPage() {
       setIsAdding(false);
     }
   };
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewItem((prev) => ({ ...prev, [name]: value }));
@@ -388,7 +388,7 @@ export default function BudgetPage() {
                             ))}
                           </div>
                         )}
-                        
+
                         {day.wants.length > 0 && (
                           <div>
                             <h3 className="text-lg font-semibold text-white mb-2">Wants</h3>

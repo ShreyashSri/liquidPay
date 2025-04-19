@@ -3,7 +3,7 @@ import { getSpendingSummary, getTx, postTransaction } from '../controllers/trans
 
 const router = express.Router();
 
-router.get("/transactions/:id", getTx)
+router.get("/:id", getTx)
 router.get("/summary/:id", getSpendingSummary)
 router.post("/postx/:id", postTransaction)
 
