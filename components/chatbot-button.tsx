@@ -1,162 +1,235 @@
 "use client";
+import { useState, useEffect, useRef, type KeyboardEvent } from "react";
+import { Send, X, MessageSquare } from "lucide-react";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { MessageSquare, X, Send, Bot, Sparkles } from "lucide-react";
+// Define types for our messages
+interface Message {
+  text: string;
+  isBot: boolean;
+  role?: "user" | "model"; // For API communication
+}
 
-export default function ChatbotButton() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
+const ChatbotButton = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [messages, setMessages] = useState<Message[]>([
     {
-      id: 1,
-      role: "bot",
-      content:
-        "Hi there! I'm Liquidpay, your personal financial assistant. How can I help you today?",
+      text: "Hello! I'm FinSavvy AI. How can I assist with your financial questions today?",
+      isBot: true,
+      role: "model",
     },
   ]);
-  const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [input, setInput] = useState<string>("");
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleSend = (e) => {
-    e.preventDefault();
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
-    // Add user message
-    const userMessage = {
-      id: messages.length + 1,
-      role: "user",
-      content: input,
-    };
-    setMessages([...messages, userMessage]);
+    const userMessage: Message = { text: input, isBot: false, role: "user" };
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const botResponses = [
-        "Based on your spending patterns, I recommend setting aside ₹5,000 for your emergency fund this month.",
-        "I noticed you've been spending more on dining out. Would you like me to suggest some budget-friendly alternatives?",
-        "Great question! Your current savings rate is 18%, which is above the recommended 15% for your age group.",
-        "I've analyzed your accounts and found 3 subscriptions you haven't used in the last 2 months. Would you like to review them?",
-        "Your investment portfolio is well-balanced, but you might want to consider increasing your exposure to index funds.",
-      ];
+    try {
+      // Format chat history for the API
+      const chatHistory = messages.map((msg) => ({
+        role: msg.isBot ? "model" : "user",
+        text: msg.text,
+      }));
 
-      const randomResponse =
-        botResponses[Math.floor(Math.random() * botResponses.length)];
-      const botMessage = {
-        id: messages.length + 2,
-        role: "bot",
-        content: randomResponse,
-      };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      // Add the new user message
+      chatHistory.push({
+        role: "user",
+        text: input,
+      });
+
+      const response = await fetch("/api/chatbot/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: input,
+          chatHistory: chatHistory,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch response");
+
+      const data = await response.json();
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: data.response,
+          isBot: true,
+          role: "model",
+        },
+      ]);
+    } catch (error) {
+      console.error("Error fetching chatbot response:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "I'm having trouble connecting right now. Please try again later.",
+          isBot: true,
+          role: "model",
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
-  return (
-    <>
-      <Button
-        onClick={toggleChat}
-        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black z-50 flex items-center justify-center"
-        size="icon"
-      >
-        {isOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <MessageSquare className="h-6 w-6" />
-        )}
-      </Button>
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") sendMessage();
+  };
 
-      {isOpen && (
-        <Card className="fixed bottom-24 right-6 w-80 md:w-96 shadow-2xl bg-gray-900 border-gray-800 z-50 overflow-hidden animate-in slide-in-from-bottom-10 duration-300">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-600 to-yellow-400"></div>
-          <CardHeader className="bg-gray-800 pb-3">
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center mr-2">
-                <Bot className="h-4 w-4 text-yellow-500" />
-              </div>
-              <CardTitle className="text-white text-lg">
-                Liquidpay Assistant
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent
-            className="p-3 max-h-96 overflow-y-auto bg-gray-900"
-            style={{ scrollBehavior: "smooth" }}
-          >
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-[85%] p-3 rounded-lg ${
-                      message.role === "user"
-                        ? "bg-yellow-600 text-white rounded-tr-none"
-                        : "bg-gray-800 text-gray-200 rounded-tl-none"
-                    }`}
-                  >
-                    <p className="text-sm">{message.content}</p>
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="max-w-[85%] p-3 rounded-lg bg-gray-800 text-gray-200 rounded-tl-none">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
-                        style={{ animationDelay: "0.4s" }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-          <CardFooter className="p-3 border-t border-gray-800 bg-gray-900">
-            <form onSubmit={handleSend} className="flex w-full space-x-2">
-              <Input
-                placeholder="Ask about your finances..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="flex-1 bg-gray-800 border-gray-700 text-white focus-visible:ring-yellow-500"
-              />
-              <Button
-                type="submit"
-                size="icon"
-                className="bg-yellow-600 hover:bg-yellow-500 text-black"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </CardFooter>
-          <div className="px-3 py-2 bg-gray-800 text-xs text-gray-400 flex items-center justify-center">
-            <Sparkles className="h-3 w-3 mr-1 text-yellow-500" /> Powered by
-            Liquidpay
+  return !isOpen ? (
+    <button
+      onClick={toggleChat}
+      className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-full shadow-lg flex items-center justify-center text-black z-50 hover:scale-110 transition-transform duration-300"
+      aria-label="Open chat support"
+    >
+      <MessageSquare size={24} />
+    </button>
+  ) : (
+    <div className="fixed bottom-6 right-6 w-80 sm:w-96 h-[500px] bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-gray-700">
+      {/* Chat Header */}
+      <div className="bg-gradient-to-r from-yellow-700 to-yellow-500 text-black px-4 py-3 flex justify-between items-center">
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-full bg-black/20 flex items-center justify-center mr-3">
+            <MessageSquare size={18} />
           </div>
-        </Card>
-      )}
-    </>
+          <div>
+            <h3 className="font-semibold">FinSavvy AI</h3>
+            <p className="text-xs text-gray-800">powered by liquidpay</p>
+          </div>
+        </div>
+        <button
+          onClick={toggleChat}
+          className="text-black hover:bg-black/10 rounded-full p-1 transition-colors"
+          aria-label="Close chat"
+        >
+          <X size={20} />
+        </button>
+      </div>
+
+      {/* Chat Messages */}
+      <div className="flex-1 p-4 overflow-y-auto bg-gray-800">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`mb-4 flex ${
+              msg.isBot ? "justify-start" : "justify-end"
+            }`}
+          >
+            {msg.isBot && (
+              <div className="w-8 h-8 rounded-full bg-yellow-500 text-black flex items-center justify-center mr-2 flex-shrink-0">
+                FS
+              </div>
+            )}
+            <div
+              className={`px-4 py-3 rounded-2xl max-w-[80%] ${
+                msg.isBot
+                  ? "bg-gray-700 text-white shadow-sm border border-gray-600 rounded-tl-none"
+                  : "bg-yellow-600 text-black rounded-tr-none"
+              }`}
+            >
+              {msg.text}
+            </div>
+          </div>
+        ))}
+
+        {isTyping && (
+          <div className="mb-4 flex justify-start">
+            <div className="w-8 h-8 rounded-full bg-yellow-500 text-black flex items-center justify-center mr-2 flex-shrink-0">
+              FS
+            </div>
+            <div className="px-4 py-3 rounded-2xl bg-gray-700 text-white shadow-sm border border-gray-600 rounded-tl-none">
+              <div className="flex space-x-1">
+                <div className="typing-dot"></div>
+                <div className="typing-dot animation-delay-200"></div>
+                <div className="typing-dot animation-delay-400"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Chat Input */}
+      <div className="p-3 border-t border-gray-700 bg-gray-900">
+        <div className="flex items-center bg-gray-800 rounded-full px-4 py-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask about your finances..."
+            className="flex-1 bg-transparent outline-none text-white"
+            disabled={isTyping}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={isTyping || !input.trim()}
+            className={`ml-2 p-2 rounded-full ${
+              !input.trim() || isTyping
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-yellow-600 hover:bg-yellow-500 text-black"
+            }`}
+            aria-label="Send message"
+          >
+            <Send size={16} />
+          </button>
+        </div>
+        <div className="text-center mt-2 text-xs text-gray-500">
+          FinSavvy AI powered by liquidpay
+        </div>
+      </div>
+
+      <style jsx>{`
+        .typing-dot {
+          width: 8px;
+          height: 8px;
+          background-color: #ffd700;
+          border-radius: 50%;
+          display: inline-block;
+          animation: bounce 1.5s infinite ease-in-out;
+        }
+
+        .animation-delay-200 {
+          animation-delay: 0.2s;
+        }
+
+        .animation-delay-400 {
+          animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+          0%,
+          60%,
+          100% {
+            transform: translateY(0);
+          }
+          30% {
+            transform: translateY(-4px);
+          }
+        }
+      `}</style>
+    </div>
   );
-}
+};
+
+export default ChatbotButton;
