@@ -25,11 +25,12 @@ import {
   Calendar,
   IndianRupee,
   Gift,
+  RefreshCw,
 } from "lucide-react";
 import axios from "axios";
 
 interface Goal {
-  _id?: string;
+  _id: string;
   title: string;
   description: string;
   targetAmount: number;
@@ -38,6 +39,14 @@ interface Goal {
   reward: number;
   isCompleted: boolean;
   isAI: boolean;
+  createdAt?: string;
+}
+
+interface NewGoalForm {
+  title: string;
+  description: string;
+  targetAmount: string;
+  deadline: string;
 }
 
 export default function SavingsPage() {
@@ -48,9 +57,13 @@ export default function SavingsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [lastGenerationTime, setLastGenerationTime] = useState<Date | null>(null);
+  const [canGenerateGoals, setCanGenerateGoals] = useState(true);
+  const [hoursRemaining, setHoursRemaining] = useState(0);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Form state for manual goal creation
-  const [newGoal, setNewGoal] = useState({
+  const [newGoal, setNewGoal] = useState<NewGoalForm>({
     title: "",
     description: "",
     targetAmount: "",
@@ -61,6 +74,58 @@ export default function SavingsPage() {
     checkAuth();
   }, []);
 
+  // Add a refresh function that can be called programmatically or on a button click
+  const refreshData = async () => {
+    if (userId) {
+      await fetchGoals(userId);
+      // Check if we can generate new goals by inspecting existing goals
+      checkGenerationStatusBasedOnGoals();
+    }
+  };
+
+  // Check generation status based on existing goals and last generation time
+  const checkGenerationStatusBasedOnGoals = () => {
+    if (!lastGenerationTime) {
+      setCanGenerateGoals(true);
+      setHoursRemaining(0);
+      return;
+    }
+
+    const currentTime = new Date();
+    const hoursSinceLastGeneration = (currentTime.getTime() - lastGenerationTime.getTime()) / (1000 * 60 * 60);
+    const cooldownPassed = hoursSinceLastGeneration >= 24;
+    
+    setCanGenerateGoals(cooldownPassed);
+    if (!cooldownPassed) {
+      setHoursRemaining(Math.ceil(24 - hoursSinceLastGeneration));
+    } else {
+      setHoursRemaining(0);
+    }
+  };
+
+  // Add an effect to periodically refresh the data
+  useEffect(() => {
+    if (userId) {
+      // Set up interval to refresh data every minute
+      const intervalId = setInterval(() => {
+        refreshData();
+      }, 60000); // 60000ms = 1 minute
+
+      // Clean up interval on component unmount
+      return () => clearInterval(intervalId);
+    }
+  }, [userId]);
+
+  // Add an effect to clear success message after 5 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const checkAuth = async () => {
     try {
       const response = await axios.get("http://localhost:8188/api/auth/checkAuth", {
@@ -68,13 +133,16 @@ export default function SavingsPage() {
       });
 
       if (response.data.success && response.data.user) {
-        setUserId(response.data.user._id);
-        fetchGoals(response.data.user._id);
+        const id = response.data.user._id;
+        setUserId(id);
+
+        // Always fetch goals from database on page load/refresh
+        await fetchGoals(id);
       } else {
         setError("User not authenticated");
         console.error("Please log in to view goals");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Auth error:", error);
       setError("Authentication error");
       console.error("Authentication error. Please log in again.");
@@ -92,7 +160,25 @@ export default function SavingsPage() {
       );
 
       if (goalsResponse.data.success) {
-        setGoals(goalsResponse.data.goals);
+        const fetchedGoals = goalsResponse.data.goals;
+        setGoals(fetchedGoals);
+        
+        // Check if there's any AI-generated goal and get its creation date
+        const aiGoals = fetchedGoals.filter((goal: Goal) => goal.isAI);
+        if (aiGoals.length > 0) {
+          // Sort by creation date, newest first
+          aiGoals.sort((a: Goal, b: Goal) => {
+            return a.createdAt && b.createdAt 
+              ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              : 0;
+          });
+          if (aiGoals[0].createdAt) {
+            setLastGenerationTime(new Date(aiGoals[0].createdAt));
+          }
+        }
+        
+        // Update generation status
+        checkGenerationStatusBasedOnGoals();
       } else {
         setError(goalsResponse.data.message || "Failed to fetch goals");
         console.error(goalsResponse.data.message || "Failed to fetch goals");
@@ -117,14 +203,16 @@ export default function SavingsPage() {
       setIsGenerating(true);
       setError(null);
 
-      // First check if there are any existing goals
-      const existingGoalsResponse = await axios.get(
-        `http://localhost:8188/api/goals/${userId}`,
-        { withCredentials: true }
-      );
+      // Check if the user can generate goals
+      if (!canGenerateGoals) {
+        setError(`You can only generate goals once every 24 hours. Please wait ${hoursRemaining} hours.`);
+        setIsGenerating(false);
+        return;
+      }
 
-      if (existingGoalsResponse.data.success && existingGoalsResponse.data.goals.length > 0) {
-        setError("You already have goals. Please complete them before generating new ones.");
+      // Don't generate new goals if there are existing ones
+      if (goals.length > 0) {
+        setError("You already have active goals. Please complete all of them before generating new ones.");
         setIsGenerating(false);
         return;
       }
@@ -136,8 +224,14 @@ export default function SavingsPage() {
       );
 
       if (goalsResponse.data.success) {
-        await fetchGoals(userId);
-        console.log("Generated 5 personalized savings goals!");
+        // Set last generation time to now
+        setLastGenerationTime(new Date());
+        // Set the new goals directly in state
+        if (goalsResponse.data.goals) {
+          setGoals(goalsResponse.data.goals);
+        }
+        setSuccessMessage("Generated personalized savings goals!");
+        console.log("Generated personalized savings goals!");
       } else {
         const errorMessage = goalsResponse.data.message || "Failed to generate goals";
         setError(errorMessage);
@@ -145,71 +239,22 @@ export default function SavingsPage() {
       }
     } catch (error: any) {
       console.error("Error generating goals:", error);
-      const errorMessage = error.response?.data?.message || 
-                        error.response?.data?.error || 
-                        "Failed to generate goals. Please try again.";
+      let errorMessage = "Failed to generate goals. Please try again.";
+
+      if (error.response?.status === 429) {
+        // Handle rate limiting error (429 Too Many Requests)
+        errorMessage = error.response?.data?.message ||
+          "You can only generate goals once every 24 hours. Please try again later.";
+      } else {
+        errorMessage = error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to generate goals. Please try again.";
+      }
+
       setError(errorMessage);
       console.error(errorMessage);
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const createManualGoal = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!userId) {
-      console.error("Please log in to create goals");
-      return;
-    }
-
-    try {
-      setIsCreating(true);
-      setError(null);
-
-      // First check if there are any existing goals
-      const existingGoalsResponse = await axios.get(
-        `http://localhost:8188/api/goals/${userId}`,
-        { withCredentials: true }
-      );
-
-      if (existingGoalsResponse.data.success && existingGoalsResponse.data.goals.length > 0) {
-        setError("You already have goals. Please complete or delete them before creating new ones.");
-        setIsCreating(false);
-        return;
-      }
-
-      const goalResponse = await axios.post(
-        `http://localhost:8188/api/goals/${userId}`,
-        {
-          ...newGoal,
-          isAI: false,
-          currentAmount: 0,
-          reward: 5, // Fixed reward of 5 SIT
-        },
-        { withCredentials: true }
-      );
-
-      if (goalResponse.data.success) {
-        setNewGoal({
-          title: "",
-          description: "",
-          targetAmount: "",
-          deadline: "",
-        });
-        await fetchGoals(userId);
-        console.log("Goal created successfully!");
-      } else {
-        setError(goalResponse.data.message || "Failed to create goal");
-        console.error(goalResponse.data.message || "Failed to create goal");
-      }
-    } catch (error: any) {
-      console.error("Error creating goal:", error);
-      const errorMessage = error.response?.data?.message || "Failed to create goal";
-      setError(errorMessage);
-      console.error(errorMessage);
-    } finally {
-      setIsCreating(false);
     }
   };
 
@@ -221,39 +266,139 @@ export default function SavingsPage() {
       );
 
       if (response.data.success) {
-        // Remove the goal from the local state
+        // Update the local state directly instead of fetching all goals again
         setGoals(prevGoals => prevGoals.filter(g => g._id !== goalId));
-        console.log("Goal completed!");
+        setSuccessMessage("Goal completed successfully!");
+        
         try {
-          const addRewardRes = await axios.post(`http://localhost:8188/api/goals/dailyreward/${userId}`);
-        } catch (rewardError: any) {
+          // Call the daily reward endpoint to potentially award tokens
+          if (userId) {
+            const addRewardRes = await axios.post(
+              `http://localhost:8188/api/goals/dailyreward/${userId}`,
+              {},
+              { withCredentials: true }
+            );
+            if (addRewardRes.data.success) {
+              console.log("Reward processing:", addRewardRes.data.message);
+              // If there was a reward, show it in the success message
+              if (addRewardRes.data.message.includes("Rewarded")) {
+                setSuccessMessage(addRewardRes.data.message);
+              }
+            }
+          }
+        } catch (rewardError) {
           console.error("Error adding reward:", rewardError);
         }
       } else {
         console.error(response.data.message || "Failed to complete goal");
+        setError(response.data.message || "Failed to complete goal");
       }
     } catch (error: any) {
       console.error("Error completing goal:", error);
-      console.error(error.response?.data?.message || "Error completing goal");
+      setError(error.response?.data?.message || "Error completing goal");
+    }
+  };
+
+  const createManualGoal = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!userId) {
+      console.error("Please log in to create goals");
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      setError(null);
+
+      // Check if there are any existing goals
+      if (goals.length > 0) {
+        setError("You already have goals. Please complete or delete them before creating new ones.");
+        setIsCreating(false);
+        return;
+      }
+
+      // Check if we're in the cooldown period
+      if (!canGenerateGoals) {
+        setError(`You can only create goals once every 24 hours. Please wait ${hoursRemaining} hours.`);
+        setIsCreating(false);
+        return;
+      }
+
+      const goalData = {
+        title: newGoal.title,
+        description: newGoal.description,
+        targetAmount: parseFloat(newGoal.targetAmount),
+        deadline: newGoal.deadline,
+        currentAmount: 0,
+        reward: 5, // Fixed reward of 5 SIT
+        isCompleted: false,
+        isAI: false
+      };
+      
+      const response = await axios.post(
+        `http://localhost:8188/api/goals/create/${userId}`,
+        goalData,
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        setNewGoal({
+          title: "",
+          description: "",
+          targetAmount: "",
+          deadline: "",
+        });
+        
+        // Set last generation time to now
+        setLastGenerationTime(new Date());
+        
+        // Add the new goal to the state instead of fetching all goals
+        if (response.data.goal) {
+          setGoals(prevGoals => [...prevGoals, response.data.goal]);
+        }
+        
+        setSuccessMessage("Goal created successfully!");
+      } else {
+        setError(response.data.message || "Failed to create goal");
+        console.error(response.data.message || "Failed to create goal");
+      }
+    } catch (error: any) {
+      console.error("Error creating goal:", error);
+      const errorMessage = error.response?.data?.message || "Failed to create goal";
+      setError(errorMessage);
+      console.error(errorMessage);
+    } finally {
+      setIsCreating(false);
     }
   };
 
   const updateGoalProgress = async (goalId: string, newAmount: number) => {
     try {
-      const response = await axios.patch(
-        `http://localhost:8188/api/goals/progress/${goalId}`,
+      // First update the goal in local state
+      setGoals(prevGoals => prevGoals.map(g =>
+        g._id === goalId ? { ...g, currentAmount: newAmount } : g
+      ));
+      
+      // Then send the update to the server
+      const response = await axios.post(
+        `http://localhost:8188/api/goals/update/${goalId}`,
         { currentAmount: newAmount },
         { withCredentials: true }
       );
-
+      
       if (response.data.success) {
-        // Update goal in local state
-        setGoals(prevGoals => prevGoals.map(g => 
-          g._id === goalId ? response.data.goal : g
-        ));
         console.log("Goal progress updated!");
+        
+        // If the goal is completed (currentAmount >= targetAmount),
+        // mark it as completed automatically
+        const updatedGoal = goals.find(g => g._id === goalId);
+        if (updatedGoal && newAmount >= updatedGoal.targetAmount) {
+          // Complete the goal if target reached
+          await completeGoal(goalId);
+        }
       } else {
-        console.error(response.data.message || "Failed to update progress");
+        console.error(response.data.message || "Failed to update goal progress");
       }
     } catch (error: any) {
       console.error("Error updating goal progress:", error);
@@ -269,21 +414,49 @@ export default function SavingsPage() {
   const handleProgressChange = (goalId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = parseFloat(e.target.value);
     if (isNaN(newAmount)) return;
-    
+
     const goal = goals.find(g => g._id === goalId);
     if (!goal) return;
-    
+
     // Update the goal locally
-    setGoals(prevGoals => prevGoals.map(g => 
-      g._id === goalId ? {...g, currentAmount: newAmount} : g
+    setGoals(prevGoals => prevGoals.map(g =>
+      g._id === goalId ? { ...g, currentAmount: newAmount } : g
     ));
   };
 
   const handleProgressBlur = (goalId: string) => {
     const goal = goals.find(g => g._id === goalId);
     if (!goal) return;
-    
+
     updateGoalProgress(goalId, goal.currentAmount);
+  };
+
+  // Add a refresh button handler
+  const handleRefresh = async () => {
+    await refreshData();
+    setSuccessMessage("Data refreshed successfully!");
+  };
+
+  // Add a helper function to render the cooldown info
+  const renderCooldownInfo = () => {
+    if (canGenerateGoals) {
+      if (goals.length === 0) {
+        return (
+          <div className="bg-green-50 p-3 rounded-md mb-4 border border-green-200">
+            <p className="text-green-700">You can generate new goals now!</p>
+          </div>
+        );
+      }
+      return null;
+    }
+
+    return (
+      <div className="bg-yellow-50 p-3 rounded-md mb-4 border border-yellow-200">
+        <p className="text-yellow-700">
+          You can generate new goals in {hoursRemaining} hours.
+        </p>
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -307,7 +480,7 @@ export default function SavingsPage() {
           <div className="flex gap-4 mt-4 md:mt-0">
             <Button
               onClick={generateAIGoals}
-              disabled={isGenerating}
+              disabled={isGenerating || !canGenerateGoals || goals.length > 0}
               className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white"
             >
               {isGenerating ? (
@@ -324,8 +497,25 @@ export default function SavingsPage() {
               <Plus className="h-4 w-4 mr-2" />
               Create Manual Goal
             </Button>
+            <Button
+              onClick={handleRefresh}
+              className="bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
           </div>
         </div>
+
+        {/* Display error message if there is one */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* Display cooldown information */}
+        {renderCooldownInfo()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-gray-800 mb-6">
@@ -366,15 +556,15 @@ export default function SavingsPage() {
                               <Input
                                 type="number"
                                 value={goal.currentAmount}
-                                onChange={(e) => handleProgressChange(goal._id!, e)}
-                                onBlur={() => handleProgressBlur(goal._id!)}
+                                onChange={(e) => handleProgressChange(goal._id, e)}
+                                onBlur={() => handleProgressBlur(goal._id)}
                                 className="bg-gray-700 border-gray-600 text-white"
                                 min="0"
                                 max={goal.targetAmount}
                               />
                             </div>
                             <Button
-                              onClick={() => completeGoal(goal._id!)}
+                              onClick={() => completeGoal(goal._id)}
                               className="w-full md:w-auto bg-green-600 hover:bg-green-500 text-white"
                             >
                               <CheckCircle className="h-4 w-4 mr-2" /> Mark Complete
@@ -420,7 +610,7 @@ export default function SavingsPage() {
                     </p>
                     <Button
                       onClick={generateAIGoals}
-                      disabled={isGenerating}
+                      disabled={isGenerating || !canGenerateGoals || goals.length > 0}
                       className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white"
                     >
                       {isGenerating ? (
@@ -447,8 +637,9 @@ export default function SavingsPage() {
               <CardContent>
                 <form onSubmit={createManualGoal} className="space-y-4">
                   <div>
-                    <Label className="text-white">Goal Title</Label>
+                    <Label className="text-white" htmlFor="title">Goal Title</Label>
                     <Input
+                      id="title"
                       name="title"
                       value={newGoal.title}
                       onChange={handleInputChange}
@@ -458,8 +649,9 @@ export default function SavingsPage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-white">Description</Label>
+                    <Label className="text-white" htmlFor="description">Description</Label>
                     <Textarea
+                      id="description"
                       name="description"
                       value={newGoal.description}
                       onChange={handleInputChange}
@@ -470,8 +662,9 @@ export default function SavingsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-white">Target Amount (₹)</Label>
+                      <Label className="text-white" htmlFor="targetAmount">Target Amount (₹)</Label>
                       <Input
+                        id="targetAmount"
                         name="targetAmount"
                         type="number"
                         value={newGoal.targetAmount}
@@ -482,8 +675,9 @@ export default function SavingsPage() {
                       />
                     </div>
                     <div>
-                      <Label className="text-white">Deadline</Label>
+                      <Label className="text-white" htmlFor="deadline">Deadline</Label>
                       <Input
+                        id="deadline"
                         name="deadline"
                         type="date"
                         value={newGoal.deadline}
@@ -495,7 +689,7 @@ export default function SavingsPage() {
                   </div>
                   <Button
                     type="submit"
-                    disabled={isCreating}
+                    disabled={isCreating || !canGenerateGoals || goals.length > 0}
                     className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white"
                   >
                     {isCreating ? (
@@ -543,15 +737,15 @@ export default function SavingsPage() {
                             <Input
                               type="number"
                               value={goal.currentAmount}
-                              onChange={(e) => handleProgressChange(goal._id!, e)}
-                              onBlur={() => handleProgressBlur(goal._id!)}
+                              onChange={(e) => handleProgressChange(goal._id, e)}
+                              onBlur={() => handleProgressBlur(goal._id)}
                               className="bg-gray-700 border-gray-600 text-white"
                               min="0"
                               max={goal.targetAmount}
                             />
                           </div>
                           <Button
-                            onClick={() => completeGoal(goal._id!)}
+                            onClick={() => completeGoal(goal._id)}
                             className="w-full md:w-auto bg-green-600 hover:bg-green-500 text-white"
                           >
                             <CheckCircle className="h-4 w-4 mr-2" /> Mark Complete
@@ -588,17 +782,17 @@ export default function SavingsPage() {
                   </CardContent>
                 </Card>
               ))}
-              
-              {goals.filter(goal => !goal.isAI).length === 0 && (
-                <Card className="bg-gray-800/70 backdrop-blur-sm border border-gray-700">
-                  <CardContent className="p-6 flex flex-col items-center justify-center">
-                    <Target className="h-12 w-12 text-yellow-500 mb-4" />
-                    <p className="text-gray-300 text-center mb-4">
-                      No manual goals yet. Create your own custom financial goal.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
+
+            {goals.filter(goal => !goal.isAI).length === 0 && (
+              <Card className="bg-gray-800/70 backdrop-blur-sm border border-gray-700">
+                <CardContent className="p-6 flex flex-col items-center justify-center">
+                  <Target className="h-12 w-12 text-yellow-500 mb-4" />
+                  <p className="text-gray-300 text-center mb-4">
+                    No manual goals yet. Create your own custom financial goal.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>

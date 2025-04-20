@@ -94,6 +94,21 @@ export const createGoal = async (req, res) => {
     }
 };
 
+// Function to check if 24 hours have passed since last goal generation
+const hasGenerationCooldownPassed = async (userId) => {
+    // Find the most recent AI goal generation timestamp
+    const lastAIGoal = await Goal.findOne({ userId, isAI: true }).sort({ createdAt: -1 });
+    
+    // If no AI goals were ever generated, cooldown is not applicable
+    if (!lastAIGoal) return true;
+    
+    const currentTime = new Date();
+    const lastGenerationTime = new Date(lastAIGoal.createdAt);
+    const hoursSinceLastGeneration = (currentTime - lastGenerationTime) / (1000 * 60 * 60);
+    
+    return hoursSinceLastGeneration >= 24;
+};
+
 export const genGoals = async (req, res) => {
     const { userId } = req.params;
 
@@ -105,6 +120,42 @@ export const genGoals = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
         console.log("User found:", user.fullname);
+
+        // Check if 24 hours have passed since last goal generation
+        const cooldownPassed = await hasGenerationCooldownPassed(userId);
+        if (!cooldownPassed) {
+            console.log("Cooldown period still active for user:", userId);
+            
+            // Calculate remaining hours in cooldown
+            const lastAIGoal = await Goal.findOne({ userId, isAI: true }).sort({ createdAt: -1 });
+            const lastGenerationTime = new Date(lastAIGoal.createdAt);
+            const currentTime = new Date();
+            const hoursSinceLastGeneration = (currentTime - lastGenerationTime) / (1000 * 60 * 60);
+            const hoursRemaining = Math.ceil(24 - hoursSinceLastGeneration);
+            
+            return res.status(429).json({ 
+                success: false, 
+                message: `Goals can only be generated once every 24 hours. Please try again in ${hoursRemaining} hours.` 
+            });
+        }
+
+        // Check if there are existing goals for this user
+        const existingGoals = await Goal.find({ userId });
+        
+        // If there are existing goals, return those without generating new ones
+        if (existingGoals.length > 0) {
+            console.log("User has existing goals. Not generating new ones.");
+            return res.status(200).json({ 
+                success: true, 
+                message: "Using existing goals", 
+                goals: existingGoals 
+            });
+        }
+
+        // At this point we know:
+        // 1. The cooldown period has passed
+        // 2. The user has no existing goals
+        // So we can generate new goals
 
         let summaryData = {};
         try {
@@ -166,9 +217,6 @@ export const genGoals = async (req, res) => {
         }
 
         try {
-            console.log("Deleting previous AI goals...");
-            await Goal.deleteMany({ userId, isAI: true }); // Remove previous AI goals only
-            
             console.log("Saving new goals...");
             const savedGoals = await Goal.insertMany(goals.map(goal => ({
                 ...goal,
@@ -273,5 +321,52 @@ export const updateGoalProgress = async (req, res) => {
     } catch (err) {
         console.error("Error updating goal progress:", err);
         res.status(500).json({ success: false, message: "Failed to update goal progress", error: err.message });
+    }
+};
+
+// Check goal generation status for a user
+export const checkGoalGenerationStatus = async (req, res) => {
+    const { userId } = req.params;
+    
+    try {
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        const lastAIGoal = await Goal.findOne({ userId, isAI: true }).sort({ createdAt: -1 });
+        const existingGoals = await Goal.find({ userId });
+        
+        if (!lastAIGoal) {
+            // User has never generated goals
+            return res.status(200).json({
+                success: true,
+                canGenerateGoals: true,
+                existingGoalsCount: existingGoals.length,
+                message: "No goals have been generated before. You can generate goals now."
+            });
+        }
+        
+        const currentTime = new Date();
+        const lastGenerationTime = new Date(lastAIGoal.createdAt);
+        const hoursSinceLastGeneration = (currentTime - lastGenerationTime) / (1000 * 60 * 60);
+        const canGenerate = hoursSinceLastGeneration >= 24;
+        const hoursRemaining = Math.ceil(24 - hoursSinceLastGeneration);
+        
+        return res.status(200).json({
+            success: true,
+            canGenerateGoals: canGenerate,
+            existingGoalsCount: existingGoals.length,
+            lastGenerationTime: lastGenerationTime,
+            hoursRemaining: canGenerate ? 0 : hoursRemaining,
+            message: canGenerate 
+                ? "You can generate new goals now." 
+                : `You can generate new goals in ${hoursRemaining} hours.`
+        });
+    } catch (err) {
+        console.error("Error checking goal generation status:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to check goal generation status", 
+            error: err.message 
+        });
     }
 };

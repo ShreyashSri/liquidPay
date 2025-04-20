@@ -7,7 +7,6 @@ const MODEL_NAME = "gemini-1.5-flash"; // This might need to be updated dependin
 
 if (!GEMINI_API_KEY) {
   console.error("❌ GEMINI_API_KEY is missing. Check your .env file.");
-  process.exit(1);
 }
 
 const VLABS_KNOWLEDGE = `
